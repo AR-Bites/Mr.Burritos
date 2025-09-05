@@ -1,6 +1,6 @@
 import { Utensils, Pizza, Drumstick, IceCream, Coffee } from "lucide-react";
 import { motion } from "framer-motion";
-import { CATEGORIES } from "@shared/schema";
+import { CATEGORIES } from "@/data/menu-data";
 
 interface SearchFiltersProps {
   onCategoryChange: (category: string) => void;
