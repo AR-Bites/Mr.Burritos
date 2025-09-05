@@ -1,24 +1,19 @@
 import { useQuery } from "@tanstack/react-query";
 import type { MenuItem } from "@/data/menu-data";
+import { MENU_ITEMS } from "@/data/menu-data";
 
 export function useMenu(category?: string) {
   return useQuery<MenuItem[]>({
-    queryKey: ["/api/menu", { category }],
+    queryKey: ["static-menu", { category }],
     queryFn: async () => {
-      const params = new URLSearchParams();
-      if (category && category !== "all") {
-        params.append("category", category);
-      }
-
-      const url = params.toString() ? `/api/menu?${params}` : "/api/menu";
-      const response = await fetch(url);
-      
-      if (!response.ok) {
-        throw new Error("Failed to fetch menu items");
+      // Use static data instead of API call
+      if (!category || category === "all") {
+        return MENU_ITEMS;
       }
       
-      return response.json();
+      // Filter by category
+      return MENU_ITEMS.filter(item => item.category === category);
     },
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: Infinity, // Static data never gets stale
   });
 }
