@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import type { MenuItem } from "@shared/schema";
+import type { MenuItem } from "@/data/menu-data";
 
 export function useMenu(category?: string) {
   return useQuery<MenuItem[]>({
