@@ -20,7 +20,7 @@ export default function AdvancedGLBViewer({ isOpen, onClose, dishName, modelPath
   const [loadingMessage, setLoadingMessage] = useState('Preparing your 3D experience...');
   const isMobile = typeof window !== 'undefined' ? window.innerWidth < 768 : false;
 
-  // Simple AR - Direct iOS AR Quick Look
+  // iOS AR Quick Look - Proper Implementation
   const handleViewInSpace = () => {
     if (!modelPath) {
       alert('3D model not available for AR view');
@@ -29,15 +29,36 @@ export default function AdvancedGLBViewer({ isOpen, onClose, dishName, modelPath
 
     console.log('🔍 Starting AR view for:', dishName);
 
-    // For iOS - Use native AR Quick Look IMMEDIATELY
+    // For iOS - Use AR Quick Look with proper rel="ar" attribute
     if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
-      console.log('📱 iOS detected - using native AR Quick Look');
+      console.log('📱 iOS detected - using AR Quick Look');
       
       const fullModelPath = window.location.origin + modelPath;
-      console.log('🌐 Direct AR link:', fullModelPath);
+      console.log('🌐 AR model URL:', fullModelPath);
       
-      // Direct navigation to GLB file for AR Quick Look
-      window.location.href = fullModelPath;
+      // Create invisible AR link and trigger it
+      const arLink = document.createElement('a');
+      arLink.href = fullModelPath;
+      arLink.rel = 'ar';
+      arLink.style.display = 'none';
+      
+      // Add required img for iOS AR Quick Look
+      const img = document.createElement('img');
+      img.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
+      arLink.appendChild(img);
+      
+      document.body.appendChild(arLink);
+      
+      // User interaction is required for iOS AR
+      arLink.click();
+      
+      // Clean up
+      setTimeout(() => {
+        if (document.body.contains(arLink)) {
+          document.body.removeChild(arLink);
+        }
+      }, 100);
+      
       return;
     }
 
