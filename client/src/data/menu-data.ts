@@ -1,4 +1,45 @@
-import { type MenuItem, CATEGORIES } from "@shared/schema";
+// Define categories locally for deployment
+export const CATEGORIES = {
+  TACOS: "tacos",
+  BURRITOS: "burritos", 
+  BURGERS: "burgers",
+  FAVORITES: "favorites",
+  SIDES: "sides",
+  SAUCES: "sauces",
+  KIDS: "kids",
+  DRINKS: "drinks",
+  HEALTHY_CORNER: "healthy_corner",
+  VEGETARIAN: "vegetarian",
+  OFFERS: "offers",
+  APPETIZERS: "appetizers",
+  MAINS: "mains", 
+  DESSERTS: "desserts"
+} as const;
+
+// Define MenuItem type locally
+export interface MenuItem {
+  id: string;
+  name: string;
+  description: string;
+  price: string;
+  category: string;
+  imageUrl: string;
+  spiceLevel: number;
+  isVegetarian: boolean;
+  isVegan: boolean;
+  isGlutenFree: boolean;
+  ingredients: string[];
+  isAvailable: boolean;
+  modelPath?: string;
+}
+
+// Define CartItem type locally  
+export interface CartItem {
+  id: string;
+  menuItemId: string;
+  quantity: number;
+  sessionId: string;
+}
 
 export const MENU_ITEMS: MenuItem[] = [
   // 🌮 TACOS
