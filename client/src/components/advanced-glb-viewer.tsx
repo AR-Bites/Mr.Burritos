@@ -20,31 +20,150 @@ export default function AdvancedGLBViewer({ isOpen, onClose, dishName, modelPath
   const [loadingMessage, setLoadingMessage] = useState('Preparing your 3D experience...');
   const isMobile = typeof window !== 'undefined' ? window.innerWidth < 768 : false;
 
-  // Handle AR View
-  const handleViewInSpace = () => {
-    if (modelPath) {
+  // Handle AR View - WebXR and AR Quick Look
+  const handleViewInSpace = async () => {
+    if (!modelPath) {
+      alert('3D model not available for AR view');
+      return;
+    }
+
+    try {
+      // Check for WebXR AR support (modern devices)
+      if ('xr' in navigator && (navigator as any).xr) {
+        const isARSupported = await (navigator as any).xr.isSessionSupported('immersive-ar');
+        if (isARSupported) {
+          await startWebXRSession();
+          return;
+        }
+      }
+
       // For iOS Safari - AR Quick Look
-      if (/iPad|iPhone|iPod/.test(navigator.userAgent) && /Safari/.test(navigator.userAgent)) {
-        const link = document.createElement('a');
-        link.href = modelPath;
-        link.rel = 'ar';
-        link.appendChild(document.createElement('img'));
-        link.style.display = 'none';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        return;
+      if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+        // Create proper AR Quick Look experience
+        const usdz = await convertGLBToUSDZ(modelPath);
+        if (usdz) {
+          const link = document.createElement('a');
+          link.href = usdz;
+          link.rel = 'ar';
+          link.appendChild(document.createElement('img'));
+          link.style.display = 'none';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          return;
+        }
+      }
+
+      // Fallback: Model Viewer with AR
+      await createModelViewerAR();
+      
+    } catch (error) {
+      console.error('AR Error:', error);
+      alert('AR not supported on this device. Please try on a mobile device with AR capabilities.');
+    }
+  };
+
+  // WebXR AR Session
+  const startWebXRSession = async () => {
+    try {
+      const session = await (navigator as any).xr!.requestSession('immersive-ar', {
+        requiredFeatures: ['local', 'hit-test'],
+        optionalFeatures: ['dom-overlay'],
+        domOverlay: { root: document.body }
+      });
+
+      // Create AR scene
+      const canvas = document.createElement('canvas');
+      const gl = canvas.getContext('webgl', { xrCompatible: true });
+      
+      if (!gl) {
+        throw new Error('WebGL not supported');
+      }
+
+      // Set up Three.js for AR
+      const arRenderer = new THREE.WebGLRenderer({ 
+        canvas: canvas, 
+        context: gl,
+        alpha: true,
+        antialias: true
+      });
+      arRenderer.setSize(window.innerWidth, window.innerHeight);
+      arRenderer.xr.enabled = true;
+      arRenderer.xr.setSession(session);
+
+      const arScene = new THREE.Scene();
+      const arCamera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 20);
+
+      // Load the model for AR
+      const loader = new GLTFLoader();
+      loader.load(modelPath!, (gltf) => {
+        const model = gltf.scene.clone();
+        
+        // Scale model appropriately for AR (smaller than desktop view)
+        const box = new THREE.Box3().setFromObject(model);
+        const size = box.getSize(new THREE.Vector3());
+        const maxDimension = Math.max(size.x, size.y, size.z);
+        const scale = 0.3 / maxDimension; // Much smaller for AR
+        model.scale.setScalar(scale);
+        
+        // Position model in front of user
+        model.position.set(0, -0.5, -1);
+        arScene.add(model);
+      });
+
+      // AR lighting
+      const light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
+      arScene.add(light);
+
+      // AR render loop
+      arRenderer.setAnimationLoop(() => {
+        arRenderer.render(arScene, arCamera);
+      });
+
+      // Handle session end
+      session.addEventListener('end', () => {
+        arRenderer.setAnimationLoop(null);
+        arRenderer.dispose();
+      });
+
+    } catch (error) {
+      console.error('WebXR AR failed:', error);
+      throw error;
+    }
+  };
+
+  // Convert GLB to USDZ for iOS AR Quick Look
+  const convertGLBToUSDZ = async (glbPath: string): Promise<string | null> => {
+    try {
+      // For now, check if we have a pre-converted USDZ file
+      const usdzPath = glbPath.replace('.glb', '.usdz');
+      
+      // Test if USDZ file exists
+      const response = await fetch(usdzPath, { method: 'HEAD' });
+      if (response.ok) {
+        return usdzPath;
       }
       
-      // For Android - WebXR or fallback
-      if ('xr' in navigator) {
-        // Future WebXR implementation
-        alert('AR functionality coming soon for Android devices!');
-      } else {
-        // Fallback: Open model in new tab for AR viewers
-        window.open(modelPath, '_blank');
-      }
+      // If no USDZ available, use GLB directly (iOS 12+ supports GLB in AR Quick Look)
+      return glbPath;
+      
+    } catch (error) {
+      console.error('USDZ conversion failed:', error);
+      return glbPath; // Fallback to GLB
     }
+  };
+
+  // Model Viewer AR fallback using Google Scene Viewer
+  const createModelViewerAR = async () => {
+    // For Android devices - use Google Scene Viewer
+    if (/Android/i.test(navigator.userAgent)) {
+      const sceneViewerUrl = `https://arvr.google.com/scene-viewer/1.0?file=${encodeURIComponent(window.location.origin + modelPath!)}&mode=ar_only&title=${encodeURIComponent(dishName)}`;
+      window.open(sceneViewerUrl, '_blank');
+      return;
+    }
+    
+    // For other devices - direct model link
+    window.open(modelPath!, '_blank');
   };
 
   useEffect(() => {
