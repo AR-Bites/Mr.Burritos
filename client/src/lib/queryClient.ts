@@ -41,35 +41,17 @@ export const getQueryFn: <T>(options: {
     return await res.json();
   };
 
-// Import static menu data for offline deployment
-import { MENU_ITEMS } from '../data/menu-data';
-
-// Offline-first query function
-const offlineQueryFn: QueryFunction = async ({ queryKey }) => {
-  const url = queryKey[0] as string;
-  
-  // Handle menu API calls with static data
-  if (url === '/api/menu') {
-    return MENU_ITEMS.slice(0, 20); // Return first 20 items including all burgers
-  }
-  
-  if (url.startsWith('/api/menu?category=')) {
-    const urlParams = new URLSearchParams(url.split('?')[1]);
-    const category = urlParams.get('category');
-    if (category) {
-      return MENU_ITEMS.filter(item => item.category === category);
-    }
-    return MENU_ITEMS.slice(0, 20);
-  }
-  
-  // Return empty array for other requests in static deployment
+// Simple query function for static data
+const staticQueryFn: QueryFunction = async ({ queryKey }) => {
+  // For static deployment, all data comes from imported files
+  // No network requests needed
   return [];
 };
 
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      queryFn: offlineQueryFn,
+      queryFn: staticQueryFn,
       refetchInterval: false,
       refetchOnWindowFocus: false,
       staleTime: Infinity,
