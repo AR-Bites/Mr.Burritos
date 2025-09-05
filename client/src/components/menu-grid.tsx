@@ -5,7 +5,7 @@ import { useModelPreloader } from "@/hooks/use-model-preloader";
 import { Button } from "@/components/ui/button";
 import MenuCard from "@/components/menu-card";
 import SearchFilters, { type FilterState } from "@/components/search-filters";
-import type { MenuItem } from "@shared/schema";
+import type { MenuItem } from "@/data/menu-data";
 import { MODEL_MAPPING } from "@/data/model-mapping";
 
 interface MenuGridProps {
