@@ -20,8 +20,8 @@ export default function AdvancedGLBViewer({ isOpen, onClose, dishName, modelPath
   const [loadingMessage, setLoadingMessage] = useState('Preparing your 3D experience...');
   const isMobile = typeof window !== 'undefined' ? window.innerWidth < 768 : false;
 
-  // Simple AR - Just use what works best on each platform
-  const handleViewInSpace = async () => {
+  // Simple AR - Direct iOS AR Quick Look
+  const handleViewInSpace = () => {
     if (!modelPath) {
       alert('3D model not available for AR view');
       return;
@@ -29,66 +29,15 @@ export default function AdvancedGLBViewer({ isOpen, onClose, dishName, modelPath
 
     console.log('🔍 Starting AR view for:', dishName);
 
-    // For iOS - Use native AR Quick Look with proper setup
+    // For iOS - Use native AR Quick Look IMMEDIATELY
     if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
       console.log('📱 iOS detected - using native AR Quick Look');
-      console.log('🔗 Model path:', modelPath);
       
       const fullModelPath = window.location.origin + modelPath;
-      console.log('🌐 Full URL:', fullModelPath);
+      console.log('🌐 Direct AR link:', fullModelPath);
       
-      // Test if model is accessible first
-      try {
-        const testResponse = await fetch(fullModelPath, { method: 'HEAD' });
-        if (!testResponse.ok) {
-          throw new Error(`Model not accessible: ${testResponse.status}`);
-        }
-        console.log('✅ Model file is accessible');
-      } catch (error) {
-        console.error('❌ Model file not accessible:', error);
-        alert('3D model file not found. Please try again.');
-        return;
-      }
-      
-      // Create AR Quick Look link with proper attributes
-      const link = document.createElement('a');
-      link.href = fullModelPath;
-      link.rel = 'ar';
-      link.setAttribute('download', `${dishName.replace(/[^a-zA-Z0-9]/g, '_')}.glb`);
-      
-      // Add required image element for iOS
-      const img = document.createElement('img');
-      img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=';
-      img.alt = dishName;
-      img.width = 1;
-      img.height = 1;
-      img.style.opacity = '0';
-      img.style.position = 'absolute';
-      img.style.pointerEvents = 'none';
-      link.appendChild(img);
-      
-      // Add to DOM temporarily
-      link.style.display = 'none';
-      document.body.appendChild(link);
-      
-      console.log('🚀 Triggering iOS AR Quick Look...');
-      
-      // Trigger the AR Quick Look
-      const clickEvent = new MouseEvent('click', {
-        view: window,
-        bubbles: true,
-        cancelable: true
-      });
-      
-      link.dispatchEvent(clickEvent);
-      
-      // Clean up after delay
-      setTimeout(() => {
-        if (document.body.contains(link)) {
-          document.body.removeChild(link);
-        }
-      }, 2000);
-      
+      // Direct navigation to GLB file for AR Quick Look
+      window.location.href = fullModelPath;
       return;
     }
 
