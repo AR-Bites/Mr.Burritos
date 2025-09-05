@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import type { CartItem } from "@shared/schema";
+import type { CartItem } from "@/data/menu-data";
 
 interface CartContextType {
   cartItems: CartItem[];
