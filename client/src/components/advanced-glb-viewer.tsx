@@ -20,46 +20,69 @@ export default function AdvancedGLBViewer({ isOpen, onClose, dishName, modelPath
   const [loadingMessage, setLoadingMessage] = useState('Preparing your 3D experience...');
   const isMobile = typeof window !== 'undefined' ? window.innerWidth < 768 : false;
 
-  // Handle AR View - WebXR and AR Quick Look
+  // Handle AR View - Simplified and More Reliable
   const handleViewInSpace = async () => {
     if (!modelPath) {
       alert('3D model not available for AR view');
       return;
     }
 
+    console.log('🔍 Starting AR view for:', dishName);
+    console.log('📱 User agent:', navigator.userAgent);
+    console.log('🎯 Model path:', modelPath);
+
     try {
-      // Check for WebXR AR support (modern devices)
-      if ('xr' in navigator && (navigator as any).xr) {
-        const isARSupported = await (navigator as any).xr.isSessionSupported('immersive-ar');
-        if (isARSupported) {
-          await startWebXRSession();
-          return;
-        }
-      }
-
-      // For iOS Safari - AR Quick Look
+      // For iOS devices - AR Quick Look (most reliable)
       if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
-        // Create proper AR Quick Look experience
-        const usdz = await convertGLBToUSDZ(modelPath);
-        if (usdz) {
-          const link = document.createElement('a');
-          link.href = usdz;
-          link.rel = 'ar';
-          link.appendChild(document.createElement('img'));
-          link.style.display = 'none';
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-          return;
-        }
+        console.log('📱 iOS device detected - using AR Quick Look');
+        
+        // Direct AR Quick Look with GLB
+        const fullModelPath = window.location.origin + modelPath;
+        console.log('🌐 Full model URL:', fullModelPath);
+        
+        const link = document.createElement('a');
+        link.href = fullModelPath;
+        link.rel = 'ar';
+        link.download = `${dishName}.glb`;
+        
+        // Add required img element for iOS
+        const img = document.createElement('img');
+        img.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
+        link.appendChild(img);
+        
+        document.body.appendChild(link);
+        console.log('🚀 Triggering iOS AR Quick Look');
+        link.click();
+        
+        // Clean up after a delay
+        setTimeout(() => {
+          if (document.body.contains(link)) {
+            document.body.removeChild(link);
+          }
+        }, 1000);
+        return;
       }
 
-      // Fallback: Model Viewer with AR
-      await createModelViewerAR();
+      // For Android devices - Google Scene Viewer
+      if (/Android/i.test(navigator.userAgent)) {
+        console.log('🤖 Android device detected - using Google Scene Viewer');
+        
+        const fullModelPath = encodeURIComponent(window.location.origin + modelPath);
+        const sceneViewerUrl = `https://arvr.google.com/scene-viewer/1.0?file=${fullModelPath}&mode=ar_only&title=${encodeURIComponent(dishName)}&link=${encodeURIComponent(window.location.href)}`;
+        
+        console.log('🌐 Scene Viewer URL:', sceneViewerUrl);
+        console.log('🚀 Opening Google Scene Viewer AR');
+        
+        window.open(sceneViewerUrl, '_blank');
+        return;
+      }
+
+      // For desktop/other devices - show helpful message
+      alert(`AR is available on mobile devices!\n\nTo view "${dishName}" in AR:\n• On iPhone/iPad: Will open camera automatically\n• On Android: Will use Google AR viewer\n\nPlease try on a mobile device for the full AR experience!`);
       
     } catch (error) {
-      console.error('AR Error:', error);
-      alert('AR not supported on this device. Please try on a mobile device with AR capabilities.');
+      console.error('❌ AR Error:', error);
+      alert(`AR view failed to launch.\n\nThis might be because:\n• Your device doesn't support AR\n• You're not on HTTPS\n• Browser doesn't support AR features\n\nTry on a newer mobile device for best results!`);
     }
   };
 
