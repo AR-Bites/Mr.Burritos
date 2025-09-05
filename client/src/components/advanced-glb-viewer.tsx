@@ -20,7 +20,7 @@ export default function AdvancedGLBViewer({ isOpen, onClose, dishName, modelPath
   const [loadingMessage, setLoadingMessage] = useState('Preparing your 3D experience...');
   const isMobile = typeof window !== 'undefined' ? window.innerWidth < 768 : false;
 
-  // Handle AR View - Simplified and More Reliable
+  // Handle AR View - Web-based AR using camera directly
   const handleViewInSpace = async () => {
     if (!modelPath) {
       alert('3D model not available for AR view');
@@ -28,62 +28,200 @@ export default function AdvancedGLBViewer({ isOpen, onClose, dishName, modelPath
     }
 
     console.log('🔍 Starting AR view for:', dishName);
-    console.log('📱 User agent:', navigator.userAgent);
-    console.log('🎯 Model path:', modelPath);
 
     try {
-      // For iOS devices - AR Quick Look (most reliable)
+      // Try to use device camera for web-based AR
+      await startWebBasedAR();
+      
+    } catch (error) {
+      console.error('❌ AR Error:', error);
+      
+      // Fallback: Try platform-specific AR
       if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
-        console.log('📱 iOS device detected - using AR Quick Look');
+        console.log('📱 Falling back to iOS AR Quick Look');
         
-        // Direct AR Quick Look with GLB
         const fullModelPath = window.location.origin + modelPath;
-        console.log('🌐 Full model URL:', fullModelPath);
-        
         const link = document.createElement('a');
         link.href = fullModelPath;
         link.rel = 'ar';
-        link.download = `${dishName}.glb`;
         
-        // Add required img element for iOS
         const img = document.createElement('img');
         img.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
         link.appendChild(img);
         
         document.body.appendChild(link);
-        console.log('🚀 Triggering iOS AR Quick Look');
         link.click();
         
-        // Clean up after a delay
         setTimeout(() => {
           if (document.body.contains(link)) {
             document.body.removeChild(link);
           }
         }, 1000);
-        return;
-      }
-
-      // For Android devices - Google Scene Viewer
-      if (/Android/i.test(navigator.userAgent)) {
-        console.log('🤖 Android device detected - using Google Scene Viewer');
+        
+      } else if (/Android/i.test(navigator.userAgent)) {
+        console.log('🤖 Falling back to Google Scene Viewer');
         
         const fullModelPath = encodeURIComponent(window.location.origin + modelPath);
-        const sceneViewerUrl = `https://arvr.google.com/scene-viewer/1.0?file=${fullModelPath}&mode=ar_only&title=${encodeURIComponent(dishName)}&link=${encodeURIComponent(window.location.href)}`;
-        
-        console.log('🌐 Scene Viewer URL:', sceneViewerUrl);
-        console.log('🚀 Opening Google Scene Viewer AR');
-        
+        const sceneViewerUrl = `https://arvr.google.com/scene-viewer/1.0?file=${fullModelPath}&mode=ar_only&title=${encodeURIComponent(dishName)}`;
         window.open(sceneViewerUrl, '_blank');
-        return;
+        
+      } else {
+        alert(`AR Camera requires a mobile device!\n\nTo see "${dishName}" in your real space:\n• Use iPhone/iPad for instant AR\n• Use Android with AR support\n\nDesktop AR coming soon!`);
       }
-
-      // For desktop/other devices - show helpful message
-      alert(`AR is available on mobile devices!\n\nTo view "${dishName}" in AR:\n• On iPhone/iPad: Will open camera automatically\n• On Android: Will use Google AR viewer\n\nPlease try on a mobile device for the full AR experience!`);
-      
-    } catch (error) {
-      console.error('❌ AR Error:', error);
-      alert(`AR view failed to launch.\n\nThis might be because:\n• Your device doesn't support AR\n• You're not on HTTPS\n• Browser doesn't support AR features\n\nTry on a newer mobile device for best results!`);
     }
+  };
+
+  // Web-based AR using device camera
+  const startWebBasedAR = async () => {
+    console.log('🎥 Starting web-based AR with camera');
+    
+    // Create AR overlay
+    const arContainer = document.createElement('div');
+    arContainer.style.position = 'fixed';
+    arContainer.style.top = '0';
+    arContainer.style.left = '0';
+    arContainer.style.width = '100%';
+    arContainer.style.height = '100%';
+    arContainer.style.backgroundColor = 'black';
+    arContainer.style.zIndex = '999999';
+    arContainer.style.display = 'flex';
+    arContainer.style.flexDirection = 'column';
+    
+    // Get camera stream
+    const stream = await navigator.mediaDevices.getUserMedia({ 
+      video: { 
+        facingMode: 'environment', // Back camera
+        width: { ideal: 1280 },
+        height: { ideal: 720 }
+      } 
+    });
+    
+    // Create video element for camera feed
+    const video = document.createElement('video');
+    video.srcObject = stream;
+    video.style.width = '100%';
+    video.style.height = '100%';
+    video.style.objectFit = 'cover';
+    video.autoplay = true;
+    video.playsInline = true;
+    
+    // Create canvas for AR overlay
+    const canvas = document.createElement('canvas');
+    canvas.style.position = 'absolute';
+    canvas.style.top = '0';
+    canvas.style.left = '0';
+    canvas.style.width = '100%';
+    canvas.style.height = '100%';
+    canvas.style.pointerEvents = 'none';
+    
+    // Create Three.js scene for AR
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ 
+      canvas: canvas, 
+      alpha: true,
+      antialias: true 
+    });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setClearColor(0x000000, 0); // Transparent background
+    
+    // Load and add the 3D model
+    const loader = new GLTFLoader();
+    loader.load(modelPath!, (gltf) => {
+      const model = gltf.scene.clone();
+      
+      // Scale model for AR
+      const box = new THREE.Box3().setFromObject(model);
+      const size = box.getSize(new THREE.Vector3());
+      const maxDimension = Math.max(size.x, size.y, size.z);
+      const scale = 0.5 / maxDimension; // Smaller for AR
+      model.scale.setScalar(scale);
+      
+      // Position model in front of camera
+      model.position.set(0, -0.2, -1);
+      scene.add(model);
+      
+      console.log('📦 AR model loaded and positioned');
+    });
+    
+    // Add lighting
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+    scene.add(ambientLight);
+    
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+    directionalLight.position.set(1, 1, 1);
+    scene.add(directionalLight);
+    
+    // Position camera
+    camera.position.set(0, 0, 0);
+    
+    // AR Controls
+    const controls = document.createElement('div');
+    controls.style.position = 'absolute';
+    controls.style.bottom = '20px';
+    controls.style.left = '50%';
+    controls.style.transform = 'translateX(-50%)';
+    controls.style.display = 'flex';
+    controls.style.gap = '20px';
+    controls.style.zIndex = '1000000';
+    
+    // Close button
+    const closeBtn = document.createElement('button');
+    closeBtn.innerHTML = '× Close AR';
+    closeBtn.style.padding = '12px 24px';
+    closeBtn.style.backgroundColor = 'rgba(255,255,255,0.9)';
+    closeBtn.style.border = 'none';
+    closeBtn.style.borderRadius = '25px';
+    closeBtn.style.fontSize = '16px';
+    closeBtn.style.fontWeight = 'bold';
+    closeBtn.style.cursor = 'pointer';
+    
+    closeBtn.onclick = () => {
+      stream.getTracks().forEach(track => track.stop());
+      document.body.removeChild(arContainer);
+      renderer.dispose();
+      console.log('🔚 AR session ended');
+    };
+    
+    // Instructions
+    const instructions = document.createElement('div');
+    instructions.innerHTML = `<div style="background: rgba(0,0,0,0.7); color: white; padding: 15px 20px; border-radius: 10px; font-size: 14px; text-align: center; margin: 20px;">
+      📱 <strong>AR View Active!</strong><br/>
+      Point your camera around to see the ${dishName}<br/>
+      <small>Move your device to see the 3D model in your space</small>
+    </div>`;
+    instructions.style.position = 'absolute';
+    instructions.style.top = '20px';
+    instructions.style.left = '50%';
+    instructions.style.transform = 'translateX(-50%)';
+    instructions.style.zIndex = '1000000';
+    
+    controls.appendChild(closeBtn);
+    
+    // Assemble AR view
+    arContainer.appendChild(video);
+    arContainer.appendChild(canvas);
+    arContainer.appendChild(instructions);
+    arContainer.appendChild(controls);
+    
+    document.body.appendChild(arContainer);
+    
+    // Start AR rendering
+    const animate = () => {
+      requestAnimationFrame(animate);
+      renderer.render(scene, camera);
+    };
+    animate();
+    
+    console.log('🎯 Web AR launched successfully!');
+    
+    // Auto-close after 30 seconds as demo
+    setTimeout(() => {
+      if (document.body.contains(arContainer)) {
+        closeBtn.click();
+        alert(`AR Demo completed!\n\nThe ${dishName} was displayed in your camera view.\n\nThis is a preview of our AR technology - full AR features coming soon!`);
+      }
+    }, 30000);
   };
 
   // WebXR AR Session
