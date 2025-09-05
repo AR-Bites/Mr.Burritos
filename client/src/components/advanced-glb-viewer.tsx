@@ -20,7 +20,7 @@ export default function AdvancedGLBViewer({ isOpen, onClose, dishName, modelPath
   const [loadingMessage, setLoadingMessage] = useState('Preparing your 3D experience...');
   const isMobile = typeof window !== 'undefined' ? window.innerWidth < 768 : false;
 
-  // Handle AR View - Web-based AR using camera directly
+  // Simple AR - Just use what works best on each platform
   const handleViewInSpace = async () => {
     if (!modelPath) {
       alert('3D model not available for AR view');
@@ -29,46 +29,46 @@ export default function AdvancedGLBViewer({ isOpen, onClose, dishName, modelPath
 
     console.log('🔍 Starting AR view for:', dishName);
 
-    try {
-      // Try to use device camera for web-based AR
-      await startWebBasedAR();
+    // For iOS - Use native AR Quick Look (perfect!)
+    if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+      console.log('📱 iOS detected - using native AR Quick Look');
       
-    } catch (error) {
-      console.error('❌ AR Error:', error);
+      const fullModelPath = window.location.origin + modelPath;
+      const link = document.createElement('a');
+      link.href = fullModelPath;
+      link.rel = 'ar';
       
-      // Fallback: Try platform-specific AR
-      if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
-        console.log('📱 Falling back to iOS AR Quick Look');
-        
-        const fullModelPath = window.location.origin + modelPath;
-        const link = document.createElement('a');
-        link.href = fullModelPath;
-        link.rel = 'ar';
-        
-        const img = document.createElement('img');
-        img.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
-        link.appendChild(img);
-        
-        document.body.appendChild(link);
-        link.click();
-        
-        setTimeout(() => {
-          if (document.body.contains(link)) {
-            document.body.removeChild(link);
-          }
-        }, 1000);
-        
-      } else if (/Android/i.test(navigator.userAgent)) {
-        console.log('🤖 Falling back to Google Scene Viewer');
-        
-        const fullModelPath = encodeURIComponent(window.location.origin + modelPath);
-        const sceneViewerUrl = `https://arvr.google.com/scene-viewer/1.0?file=${fullModelPath}&mode=ar_only&title=${encodeURIComponent(dishName)}`;
-        window.open(sceneViewerUrl, '_blank');
-        
-      } else {
-        alert(`AR Camera requires a mobile device!\n\nTo see "${dishName}" in your real space:\n• Use iPhone/iPad for instant AR\n• Use Android with AR support\n\nDesktop AR coming soon!`);
-      }
+      // Add required img element
+      const img = document.createElement('img');
+      img.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
+      img.style.display = 'none';
+      link.appendChild(img);
+      
+      document.body.appendChild(link);
+      link.click();
+      
+      // Clean up
+      setTimeout(() => {
+        if (document.body.contains(link)) {
+          document.body.removeChild(link);
+        }
+      }, 1000);
+      
+      return;
     }
+
+    // For Android - Use Google Scene Viewer
+    if (/Android/i.test(navigator.userAgent)) {
+      console.log('🤖 Android detected - using Google Scene Viewer');
+      
+      const fullModelPath = encodeURIComponent(window.location.origin + modelPath);
+      const sceneViewerUrl = `https://arvr.google.com/scene-viewer/1.0?file=${fullModelPath}&mode=ar_only&title=${encodeURIComponent(dishName)}`;
+      window.open(sceneViewerUrl, '_blank');
+      return;
+    }
+
+    // For desktop - explain that AR needs mobile
+    alert(`AR works best on mobile!\n\nTo see "${dishName}" in your space:\n• iPhone/iPad: Native AR experience\n• Android: Google AR viewer\n\nPlease try on your phone! 📱`);
   };
 
   // Advanced AR with plane detection and realistic placement
