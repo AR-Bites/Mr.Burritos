@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import AdvancedGLBViewer from "@/components/advanced-glb-viewer";
 import { getModelPath, hasModel } from "@/data/model-mapping";
-import type { MenuItem } from "@shared/schema";
+import type { MenuItem } from "@/data/menu-data";
 
 interface MenuCardProps {
   item: MenuItem;
