@@ -1,0 +1,123 @@
+Mr. Burritos Menu
+
+🌯 TACOS
+	•	Chicken Grilled (Hard) – 1.70 JD
+	•	Chicken Grilled (Soft) – 1.85 JD
+	•	Beef (Hard) – 1.75 JD
+	•	Beef (Soft) – 1.99 JD
+	•	Hawaiian – 1.80 JD
+	•	Cherry Beef – 1.99 JD
+	•	Dynamite Chicken – 1.85 JD
+	•	Dynamite Shrimp – 2.49 JD
+	•	Birria Taco (2 pcs) – 6.00 JD
+
+⸻
+
+🌯 BURRITOS
+	•	Super Burrito (Chicken 12”) – 5.25 JD
+	•	Super Burrito (Beef 12”) – 5.49 JD
+	•	California Style Burrito 12” – 5.25 JD
+	•	Dynamite Burrito 12” – 5.25 JD
+	•	Burrito Bowl (Customize your own) – 5.25 JD
+	•	Zinger 12” – 4.20 JD
+	•	Turkey Burrito 10” – 1.85 JD
+
+⸻
+
+🍔 BURGERS
+	•	Chicken Grilled (2 pcs) – 3.75 JD
+	•	Classic (2 pcs) – 4.75 JD
+	•	Mushroom (2 pcs) – 4.75 JD
+	•	Mr. Smokey (2 pcs) – 4.75 JD
+
+⸻
+
+⭐ FAVORITES
+	•	Arabian Fajita – 3.25 JD
+	•	Fajita Platter (Elvis) – 5.99 JD (+ Guacamole & Sour Cream +1.00 JD)
+	•	Quesadilla Chicken – 5.25 JD
+	•	Quesadilla Beef – 5.49 JD
+	•	Quesadilla Birria – 6.25 JD
+	•	Quesadilla Vegetarian – 4.25 JD
+	•	Tostada Chicken – 4.25 JD
+	•	Tostada Beef – 5.25 JD
+	•	Dynamite Bowl Chicken – 4.25 JD
+	•	Dynamite Bowl Shrimp – 6.25 JD
+
+⸻
+
+🍟 SIDES
+	•	Garlic Tortilla – 1.49 JD
+	•	Tortilla Chips & Salsa – 1.45 JD
+	•	Curly Fries – 1.60 JD
+	•	French Fries / Steak Fries – 1.45 JD
+	•	Mexican Fries – 3.49 JD
+	•	Chicken Fries – 4.75 JD
+	•	Dynamite Chicken Fries – 4.75 JD
+	•	Nachos Vegetarian – 3.99 JD
+	•	Nachos Chicken – 4.99 JD
+	•	Nachos Beef – 5.25 JD
+	•	Chicken Tenders – 2.85 JD
+
+⸻
+
+🥣 SAUCES
+	•	Sour Cream – 0.50 JD
+	•	Guacamole – 1.25 JD
+	•	Salsa Verde – 0.65 JD
+	•	Extra Cheese – 0.65 JD
+	•	Mexican Hot Sauce – 0.50 JD
+	•	Dynamite – 0.60 JD
+	•	Ranch – 0.60 JD
+
+⸻
+
+🥗 HEALTHY CORNER
+	•	Healthy Burrito (600 Kcal) – 4.49 JD
+	•	Healthy Platter (400 Kcal) – 4.49 JD
+	•	Keto Burrito (600 Kcal) – 4.49 JD
+	•	Keto Burger 150g (500 Kcal) – 4.49 JD
+	•	Taco Salad – 3.49 JD (+ Chicken +1.25 JD)
+
+⸻
+
+🥬 VEGETARIAN
+	•	Vegetarian Taco – 1.50 JD
+	•	Vegetarian Burrito – 3.99 JD
+	•	Vegetarian Nachos – 4.49 JD
+	•	Vegetarian Quesadilla – 4.25 JD
+
+⸻
+
+🥤 DRINKS
+	•	Water – 0.35 JD
+	•	Soft Drinks – 0.50 JD
+	•	Juice – 0.75 JD
+	•	Jarritos – 2.00 JD
+	•	Redbull – 2.00 JD
+
+⸻
+
+👨‍👩‍👧 OFFERS
+	•	Tex Mex (4 ppl) – 24.99 JD
+(4 Chicken Tacos, 1 Chicken Tostada, 1 Chicken Quesadilla, 1 Beef Nachos, 1 Chicken Burrito, 4 Soft Drinks)
+	•	Dueto (2 ppl) – 12.49 JD
+(1 Chicken Tostada, 1 Chicken Quesadilla, Garlic Tortilla, Fries, 2 Soft Drinks)
+	•	Taco Kit (5 ppl)
+	•	Chicken – 16.99 JD
+	•	Mix – 17.99 JD
+	•	Beef – 18.99 JD
+
+⸻
+
+👶 KIDS MEALS
+	•	Mini Burger (Fries & Juice) – 3.99 JD
+	•	Taco (Soft or Hard, Fries & Juice) – 3.99 JD
+	•	Chicken Tenders (Fries & Juice) – 3.99 JD
+
+⸻
+
+🍴 ADD-ON
+
+Go Meal – 1.75 JD
+(Soft Drink + Fries + Sauce OR Soft Drink + Tortilla Chips & Salsa)

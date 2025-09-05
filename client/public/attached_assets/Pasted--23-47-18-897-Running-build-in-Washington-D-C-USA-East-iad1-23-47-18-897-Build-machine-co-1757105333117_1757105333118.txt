@@ -1,0 +1,41 @@
+[23:47:18.897] Running build in Washington, D.C., USA (East) – iad1
+[23:47:18.897] Build machine configuration: 2 cores, 8 GB
+[23:47:18.928] Cloning github.com/AR-Bites/Mr.Burritos (Branch: main, Commit: e178177)
+[23:47:19.060] Previous build caches not available
+[23:47:37.209] Cloning completed: 18.281s
+[23:47:37.868] Running "vercel build"
+[23:47:38.262] Vercel CLI 47.0.5
+[23:47:38.885] Running "install" command: `npm install`...
+[23:47:40.187] npm error code ERESOLVE
+[23:47:40.188] npm error ERESOLVE could not resolve
+[23:47:40.188] npm error
+[23:47:40.188] npm error While resolving: @google/model-viewer@4.1.0
+[23:47:40.189] npm error Found: three@0.180.0
+[23:47:40.189] npm error node_modules/three
+[23:47:40.189] npm error   three@"^0.180.0" from the root project
+[23:47:40.189] npm error   peer three@">= 0.159.0" from @monogrid/gainmap-js@3.1.0
+[23:47:40.189] npm error   node_modules/@monogrid/gainmap-js
+[23:47:40.190] npm error     @monogrid/gainmap-js@"^3.1.0" from @google/model-viewer@4.1.0
+[23:47:40.190] npm error     node_modules/@google/model-viewer
+[23:47:40.190] npm error       @google/model-viewer@"^4.1.0" from the root project
+[23:47:40.190] npm error
+[23:47:40.190] npm error Could not resolve dependency:
+[23:47:40.190] npm error peer three@"^0.172.0" from @google/model-viewer@4.1.0
+[23:47:40.190] npm error node_modules/@google/model-viewer
+[23:47:40.190] npm error   @google/model-viewer@"^4.1.0" from the root project
+[23:47:40.190] npm error
+[23:47:40.190] npm error Conflicting peer dependency: three@0.172.0
+[23:47:40.190] npm error node_modules/three
+[23:47:40.190] npm error   peer three@"^0.172.0" from @google/model-viewer@4.1.0
+[23:47:40.190] npm error   node_modules/@google/model-viewer
+[23:47:40.190] npm error     @google/model-viewer@"^4.1.0" from the root project
+[23:47:40.190] npm error
+[23:47:40.191] npm error Fix the upstream dependency conflict, or retry
+[23:47:40.191] npm error this command with --force or --legacy-peer-deps
+[23:47:40.191] npm error to accept an incorrect (and potentially broken) dependency resolution.
+[23:47:40.191] npm error
+[23:47:40.191] npm error
+[23:47:40.191] npm error For a full report see:
+[23:47:40.191] npm error /vercel/.npm/_logs/2025-09-05T20_47_39_138Z-eresolve-report.txt
+[23:47:40.191] npm error A complete log of this run can be found in: /vercel/.npm/_logs/2025-09-05T20_47_39_138Z-debug-0.log
+[23:47:40.224] Error: Command "npm install" exited with 1
