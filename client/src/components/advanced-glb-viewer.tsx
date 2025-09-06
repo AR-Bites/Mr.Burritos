@@ -21,35 +21,107 @@ const AdvancedGLBViewer: React.FC<AdvancedGLBViewerProps> = ({
   const [loadingMessage, setLoadingMessage] = useState('Preparing your 3D experience...');
   const isMobile = typeof window !== 'undefined' ? window.innerWidth < 768 : false;
 
-  // AR Code Style Experience - Button Click → Instant AR Camera
-  const handleViewInSpace = async () => {
+  // REAL iOS AR Quick Look - Direct Native AR
+  const handleViewInSpace = () => {
     if (!modelPath) {
       alert('3D model not available for AR view');
       return;
     }
 
-    console.log('🔍 Starting AR Code style experience for:', dishName);
+    console.log('🔍 Starting REAL iOS AR Quick Look for:', dishName);
 
-    try {
-      // Request camera permission (like AR Code app does)
-      console.log('📷 Requesting camera access...');
+    // iOS - Use native AR Quick Look (requires USDZ conversion)
+    if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+      console.log('📱 iOS detected - converting GLB to USDZ for native AR Quick Look');
       
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: 'environment', // Back camera for AR
-          width: { ideal: 1920, min: 1280 },
-          height: { ideal: 1080, min: 720 }
+      // Convert GLB to USDZ and launch native iOS AR
+      convertAndLaunchIOSAR();
+      return;
+    }
+
+    // Android - Google Scene Viewer  
+    if (/Android/i.test(navigator.userAgent)) {
+      console.log('🤖 Android detected - using Google Scene Viewer');
+      const modelUrl = encodeURIComponent(window.location.origin + modelPath);
+      const sceneViewerUrl = `https://arvr.google.com/scene-viewer/1.0?file=${modelUrl}&mode=ar_only&title=${encodeURIComponent(dishName)}`;
+      window.open(sceneViewerUrl, '_blank');
+      return;
+    }
+
+    // Fallback - web AR for other devices
+    alert('AR viewing requires iOS (iPhone/iPad) or Android with AR support.');
+  };
+
+  // Convert GLB to USDZ and launch native iOS AR Quick Look
+  const convertAndLaunchIOSAR = async () => {
+    try {
+      console.log('🔄 Converting GLB to USDZ for iOS AR Quick Look...');
+      
+      // Fetch the GLB file
+      const response = await fetch(window.location.origin + modelPath);
+      const glbData = await response.arrayBuffer();
+      
+      // Convert to USDZ using web-based converter
+      const formData = new FormData();
+      const glbBlob = new Blob([glbData], { type: 'model/gltf-binary' });
+      formData.append('file', glbBlob, 'model.glb');
+      
+      // Use free online GLB to USDZ converter API
+      const convertResponse = await fetch('https://api.pixyz.com/v1/convert', {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Accept': 'application/octet-stream'
         }
       });
-
-      console.log('✅ Camera access granted! Launching AR experience...');
       
-      // Immediately launch full-screen AR camera (like AR Code)
-      launchARCodeExperience(stream);
-
+      if (convertResponse.ok) {
+        const usdzData = await convertResponse.arrayBuffer();
+        
+        // Create USDZ blob URL
+        const usdzBlob = new Blob([usdzData], { type: 'model/vnd.usdz+zip' });
+        const usdzUrl = URL.createObjectURL(usdzBlob);
+        
+        console.log('✅ GLB converted to USDZ successfully!');
+        
+        // Launch iOS AR Quick Look with USDZ
+        const arLink = document.createElement('a');
+        arLink.href = usdzUrl;
+        arLink.rel = 'ar';
+        arLink.download = dishName.replace(/[^a-zA-Z0-9]/g, '_') + '.usdz';
+        
+        // Required image for iOS AR Quick Look
+        const img = document.createElement('img');
+        img.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
+        img.alt = dishName;
+        arLink.appendChild(img);
+        
+        document.body.appendChild(arLink);
+        arLink.click();
+        document.body.removeChild(arLink);
+        
+        console.log('🚀 REAL iOS AR Quick Look launched with USDZ!');
+        
+        // Clean up blob URL
+        setTimeout(() => URL.revokeObjectURL(usdzUrl), 5000);
+        
+      } else {
+        throw new Error('Conversion failed');
+      }
+      
     } catch (error) {
-      console.error('❌ Camera access denied:', error);
-      alert('Camera access is required for AR. Please allow camera access to view your 3D model in space!');
+      console.error('❌ GLB to USDZ conversion failed:', error);
+      console.log('🔄 Falling back to web-based AR...');
+      
+      // Fallback to web AR if conversion fails
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: 'environment' }
+        });
+        launchARCodeExperience(stream);
+      } catch (cameraError) {
+        alert('Unable to access AR. Please try again or use a different device.');
+      }
     }
   };
 
