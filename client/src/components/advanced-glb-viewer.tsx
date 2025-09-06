@@ -30,30 +30,27 @@ const AdvancedGLBViewer: React.FC<AdvancedGLBViewerProps> = ({
 
     console.log('🔍 Starting native AR for:', dishName);
 
-    // iOS AR Quick Look - Direct to native AR camera
+    // iOS - Need to use web-based AR since GLB files don't work with AR Quick Look
     if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
-      console.log('📱 iOS detected - launching native AR Quick Look');
+      console.log('📱 iOS detected - starting web AR camera');
       
-      const fullModelPath = window.location.origin + modelPath;
+      // Request camera permission and start AR
+      navigator.mediaDevices.getUserMedia({ 
+        video: { 
+          facingMode: 'environment',
+          width: { ideal: 1920 },
+          height: { ideal: 1080 }
+        } 
+      })
+      .then((stream) => {
+        console.log('✅ Camera permission granted - starting AR');
+        startWebAR(stream);
+      })
+      .catch((error) => {
+        console.error('❌ Camera permission denied:', error);
+        alert('Camera access is required for AR. Please allow camera access and try again.');
+      });
       
-      // Create a direct link with rel="ar" - this tells iOS to open AR Quick Look
-      const link = document.createElement('a');
-      link.href = fullModelPath;
-      link.rel = 'ar';
-      link.download = dishName.replace(/[^a-zA-Z0-9]/g, '_') + '.usdz';
-      
-      // iOS requires an img element for AR Quick Look
-      const img = document.createElement('img');
-      img.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
-      img.alt = dishName;
-      link.appendChild(img);
-      
-      // Trigger the AR Quick Look directly
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      
-      console.log('🚀 iOS AR Quick Look launched!');
       return;
     }
 
@@ -73,6 +70,116 @@ const AdvancedGLBViewer: React.FC<AdvancedGLBViewerProps> = ({
     alert('AR viewing requires iOS (iPhone/iPad) or Android with AR support. Please try on a mobile device with Safari or Chrome.');
   };
 
+  // Start web-based AR camera experience
+  const startWebAR = (stream: MediaStream) => {
+    console.log('🎥 Starting web AR camera');
+    
+    // Create full-screen AR overlay
+    const arOverlay = document.createElement('div');
+    arOverlay.style.position = 'fixed';
+    arOverlay.style.top = '0';
+    arOverlay.style.left = '0';
+    arOverlay.style.width = '100%';
+    arOverlay.style.height = '100%';
+    arOverlay.style.backgroundColor = 'black';
+    arOverlay.style.zIndex = '999999';
+    
+    // Create camera video
+    const video = document.createElement('video');
+    video.srcObject = stream;
+    video.style.width = '100%';
+    video.style.height = '100%';
+    video.style.objectFit = 'cover';
+    video.autoplay = true;
+    video.playsInline = true;
+    
+    // Create 3D canvas overlay
+    const canvas = document.createElement('canvas');
+    canvas.style.position = 'absolute';
+    canvas.style.top = '0';
+    canvas.style.left = '0';
+    canvas.style.width = '100%';
+    canvas.style.height = '100%';
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    
+    // Three.js AR scene
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 20);
+    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setClearColor(0x000000, 0);
+    
+    // Lighting
+    scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+    const light = new THREE.DirectionalLight(0xffffff, 0.8);
+    light.position.set(5, 10, 5);
+    scene.add(light);
+    
+    // Load 3D model
+    const loader = new GLTFLoader();
+    let arModel: THREE.Group | null = null;
+    
+    loader.load(modelPath!, (gltf) => {
+      console.log('✅ 3D model loaded for AR');
+      
+      const model = gltf.scene;
+      const box = new THREE.Box3().setFromObject(model);
+      const size = box.getSize(new THREE.Vector3());
+      const scale = 0.3 / Math.max(size.x, size.y, size.z);
+      model.scale.setScalar(scale);
+      model.position.set(0, -0.5, -1.5);
+      
+      arModel = new THREE.Group();
+      arModel.add(model);
+      scene.add(arModel);
+    });
+    
+    // Close button
+    const closeBtn = document.createElement('button');
+    closeBtn.innerHTML = '✕ Exit AR';
+    closeBtn.style.cssText = `
+      position: absolute; top: 20px; right: 20px; z-index: 1000000;
+      background: rgba(0,0,0,0.8); color: white; border: 1px solid white;
+      padding: 12px 20px; border-radius: 25px; font-size: 16px; cursor: pointer;
+    `;
+    closeBtn.onclick = () => {
+      stream.getTracks().forEach(track => track.stop());
+      document.body.removeChild(arOverlay);
+    };
+    
+    // Instructions
+    const instructions = document.createElement('div');
+    instructions.innerHTML = `
+      <div style="color: white; text-align: center; padding: 20px; background: rgba(0,0,0,0.8); border-radius: 15px;">
+        <h3 style="margin: 0 0 10px; font-size: 18px;">🍔 ${dishName} in AR!</h3>
+        <p style="margin: 0; font-size: 14px;">Move your phone to see it from different angles</p>
+      </div>
+    `;
+    instructions.style.cssText = `
+      position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+      z-index: 1000000; max-width: 300px;
+    `;
+    
+    // Assemble AR view
+    arOverlay.appendChild(video);
+    arOverlay.appendChild(canvas);
+    arOverlay.appendChild(closeBtn);
+    arOverlay.appendChild(instructions);
+    document.body.appendChild(arOverlay);
+    
+    // Animation loop
+    const animate = () => {
+      requestAnimationFrame(animate);
+      if (arModel) {
+        arModel.rotation.y += 0.01;
+      }
+      renderer.render(scene, camera);
+    };
+    animate();
+    
+    console.log('🚀 AR camera experience started!');
+  };
 
   useEffect(() => {
     if (!isOpen || !containerRef.current || !modelPath) return;
