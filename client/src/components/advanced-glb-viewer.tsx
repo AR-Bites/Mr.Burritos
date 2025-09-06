@@ -21,21 +21,84 @@ const AdvancedGLBViewer: React.FC<AdvancedGLBViewerProps> = ({
   const [loadingMessage, setLoadingMessage] = useState('Preparing your 3D experience...');
   const isMobile = typeof window !== 'undefined' ? window.innerWidth < 768 : false;
 
-  // REAL iOS AR Quick Look - Direct Native AR
-  const handleViewInSpace = () => {
+  // PROPER iOS AR Quick Look with REAL USDZ Conversion
+  const handleViewInSpace = async () => {
     if (!modelPath) {
       alert('3D model not available for AR view');
       return;
     }
 
-    console.log('🔍 Starting REAL iOS AR Quick Look for:', dishName);
+    console.log('🔍 Starting iOS AR Quick Look with proper conversion for:', dishName);
 
-    // iOS - Use native AR Quick Look (requires USDZ conversion)
+    // iOS - Convert GLB to USDZ properly
     if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
-      console.log('📱 iOS detected - converting GLB to USDZ for native AR Quick Look');
+      console.log('📱 iOS detected - converting GLB to valid USDZ');
       
-      // Convert GLB to USDZ and launch native iOS AR
-      convertAndLaunchIOSAR();
+      try {
+        // Show loading
+        const loading = document.createElement('div');
+        loading.innerHTML = `
+          <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.9); color: white; padding: 30px; border-radius: 20px; z-index: 999999; text-align: center;">
+            <div style="width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.3); border-top: 3px solid #007AFF; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
+            <h3 style="margin: 0 0 10px;">Converting for iOS AR...</h3>
+            <p style="margin: 0; opacity: 0.8;">Creating USDZ file from GLB</p>
+          </div>
+          <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
+        `;
+        document.body.appendChild(loading);
+
+        // Convert using online service
+        const response = await fetch(window.location.origin + modelPath);
+        const glbData = await response.arrayBuffer();
+        
+        const formData = new FormData();
+        const glbBlob = new Blob([glbData], { type: 'model/gltf-binary' });
+        formData.append('file', glbBlob, 'model.glb');
+        
+        // Use reliable converter
+        const convertResponse = await fetch('https://api.aspose.app/3d/conversion/glb-to-usdz', {
+          method: 'POST',
+          body: formData
+        });
+        
+        document.body.removeChild(loading);
+        
+        if (convertResponse.ok) {
+          const usdzData = await convertResponse.arrayBuffer();
+          const usdzBlob = new Blob([usdzData], { type: 'model/vnd.usdz+zip' });
+          const usdzUrl = URL.createObjectURL(usdzBlob);
+          
+          console.log('✅ GLB successfully converted to valid USDZ!');
+          
+          // Launch iOS AR Quick Look with valid USDZ
+          const arLink = document.createElement('a');
+          arLink.href = usdzUrl;
+          arLink.rel = 'ar';
+          
+          const img = document.createElement('img');
+          img.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
+          img.alt = dishName;
+          arLink.appendChild(img);
+          
+          document.body.appendChild(arLink);
+          arLink.click();
+          
+          console.log('🚀 iOS AR Quick Look launched with valid USDZ!');
+          
+          setTimeout(() => {
+            document.body.removeChild(arLink);
+            URL.revokeObjectURL(usdzUrl);
+          }, 1000);
+          
+        } else {
+          throw new Error('Conversion failed');
+        }
+        
+      } catch (error) {
+        console.error('❌ USDZ conversion failed:', error);
+        alert('Failed to convert model for iOS AR. Please try again.');
+      }
+      
       return;
     }
 
@@ -48,7 +111,7 @@ const AdvancedGLBViewer: React.FC<AdvancedGLBViewerProps> = ({
       return;
     }
 
-    // Fallback - web AR for other devices
+    // Fallback
     alert('AR viewing requires iOS (iPhone/iPad) or Android with AR support.');
   };
 
