@@ -71,7 +71,7 @@ export const MENU_ITEMS: MenuItem[] = [
     isGlutenFree: false,
     ingredients: ["grilled chicken", "soft tortilla", "lettuce", "tomato", "cheese"],
     isAvailable: true,
-    modelPath: "/attached_assets/kids meal soft taco_1756917134815.glb"
+    modelPath: "/attached_assets/Taco_Soft(Kids_Meals_Catgories)_1757009677820.glb"
   },
   {
     id: "3",
@@ -101,7 +101,7 @@ export const MENU_ITEMS: MenuItem[] = [
     isGlutenFree: false,
     ingredients: ["ground beef", "soft tortilla", "lettuce", "tomato", "cheese"],
     isAvailable: true,
-    modelPath: "/attached_assets/kids meal soft taco_1756917134815.glb"
+    modelPath: "/attached_assets/Taco_Soft(Kids_Meals_Catgories)_1757009677820.glb"
   },
   {
     id: "5",
@@ -238,7 +238,7 @@ export const MENU_ITEMS: MenuItem[] = [
     isGlutenFree: false,
     ingredients: ["grilled chicken", "bell peppers", "onions", "rice", "flour tortilla"],
     isAvailable: true,
-    modelPath: "/attached_assets/2-fahita burrito_1756916625949.glb"
+    modelPath: "/attached_assets/Fajita_Burrito(Burritos_Category)_1757009354376.glb"
   },
   {
     id: "14",
@@ -362,7 +362,7 @@ export const MENU_ITEMS: MenuItem[] = [
     isGlutenFree: true,
     ingredients: ["rice", "black beans", "chicken", "dynamite sauce", "corn", "lettuce"],
     isAvailable: true,
-    modelPath: "/attached_assets/1-dynamite bowl_1756916613906.glb"
+    modelPath: "/attached_assets/Dynamite_Bowl(Favorites_Category)_1757009297747.glb"
   },
   {
     id: "22",
@@ -377,7 +377,7 @@ export const MENU_ITEMS: MenuItem[] = [
     isGlutenFree: false,
     ingredients: ["grilled beef", "bell peppers", "onions", "tortillas", "guacamole", "sour cream"],
     isAvailable: true,
-    modelPath: "/attached_assets/3-fahita platter_1756916638887.glb"
+    modelPath: "/attached_assets/Fajita_Platter(Favorites_Category)_1757009365917.glb"
   },
   {
     id: "23",
@@ -424,7 +424,7 @@ export const MENU_ITEMS: MenuItem[] = [
     isGlutenFree: true,
     ingredients: ["french fries", "cheese sauce", "jalapeños", "Mexican seasoning"],
     isAvailable: true,
-    modelPath: "/attached_assets/6-mexican fries_1756916717240.glb"
+    modelPath: "/attached_assets/Mexican_Fries(Sides_Category)_1757009528617.glb"
   },
   {
     id: "26",
@@ -439,7 +439,7 @@ export const MENU_ITEMS: MenuItem[] = [
     isGlutenFree: true,
     ingredients: ["tortilla chips", "cheese", "choice of protein", "jalapeños", "sour cream"],
     isAvailable: true,
-    modelPath: "/attached_assets/7-nachos ( beef, chicken , vege)_1756916738360.glb"
+    modelPath: "/attached_assets/Nachos(Sides_Category)_1757009627864.glb"
   },
   {
     id: "27",
@@ -486,7 +486,7 @@ export const MENU_ITEMS: MenuItem[] = [
     isGlutenFree: false,
     ingredients: ["soft tortilla", "mild chicken", "cheese", "lettuce"],
     isAvailable: true,
-    modelPath: "/attached_assets/Taco_Soft(Kids_Meals_Catgories)_1757009677820.glb"
+    modelPath: "/attached_assets/kids meal soft taco_1756917134815.glb"
   },
   {
     id: "30",
@@ -518,7 +518,7 @@ export const MENU_ITEMS: MenuItem[] = [
     isGlutenFree: true,
     ingredients: ["grilled chicken", "mixed greens", "tomatoes", "cucumbers", "avocado"],
     isAvailable: true,
-    modelPath: "/attached_assets/5-healthy platter__1756916699390.glb"
+    modelPath: "/attached_assets/Healthy_Platter(Healthy_Corner_Category)_1757009513885.glb"
   },
   {
     id: "32",
@@ -567,7 +567,7 @@ export const MENU_ITEMS: MenuItem[] = [
     isGlutenFree: false,
     ingredients: ["taco shells", "seasoned beef", "cheese", "lettuce", "tomatoes", "sour cream"],
     isAvailable: true,
-    modelPath: "/attached_assets/18-taco kit_1756916979854.glb"
+    modelPath: "/attached_assets/Taco_Kit(Offers_Category)_1757009658196.glb"
   },
 
   // 🥤 DRINKS
