@@ -20,15 +20,35 @@ export default function AdvancedGLBViewer({ isOpen, onClose, dishName, modelPath
   const [loadingMessage, setLoadingMessage] = useState('Preparing your 3D experience...');
   const isMobile = typeof window !== 'undefined' ? window.innerWidth < 768 : false;
 
-  // Handle AR View - Direct Camera AR Experience
-  const handleViewInSpace = () => {
+  // Direct AR activation without overlay
+  const activateARDirectly = () => {
     if (!modelPath) {
       alert('3D model not available for AR view');
       return;
     }
 
-    // Create model-viewer element for instant AR experience
-    createModelViewerAR();
+    // Close current modal first
+    onClose();
+
+    // Directly activate AR based on device
+    if (/Android/i.test(navigator.userAgent)) {
+      // Android: Google Scene Viewer
+      const sceneViewerUrl = `https://arvr.google.com/scene-viewer/1.0?file=${encodeURIComponent(window.location.origin + modelPath)}&mode=ar_only&title=${encodeURIComponent(dishName)}`;
+      window.open(sceneViewerUrl, '_blank');
+    } else if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+      // iOS: AR Quick Look
+      const link = document.createElement('a');
+      link.href = modelPath;
+      link.rel = 'ar';
+      link.appendChild(document.createElement('img'));
+      link.style.display = 'none';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else {
+      // Desktop/other: Show instruction
+      alert('AR is best experienced on mobile devices. Please try on your phone or tablet for the full AR experience!');
+    }
   };
 
   // Model Viewer AR - Direct Camera AR Experience
@@ -886,7 +906,7 @@ export default function AdvancedGLBViewer({ isOpen, onClose, dishName, modelPath
             
             {modelPath && (
               <button
-                onClick={handleViewInSpace}
+                onClick={activateARDirectly}
                 style={{
                   background: 'linear-gradient(135deg, #000000, #1a1a1a)',
                   color: '#ffffff',
