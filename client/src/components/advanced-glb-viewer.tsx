@@ -36,19 +36,75 @@ export default function AdvancedGLBViewer({ isOpen, onClose, dishName, modelPath
       const sceneViewerUrl = `https://arvr.google.com/scene-viewer/1.0?file=${encodeURIComponent(window.location.origin + modelPath)}&mode=ar_only&title=${encodeURIComponent(dishName)}`;
       window.open(sceneViewerUrl, '_blank');
     } else if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
-      // iOS: AR Quick Look
-      const link = document.createElement('a');
-      link.href = modelPath;
-      link.rel = 'ar';
-      link.appendChild(document.createElement('img'));
-      link.style.display = 'none';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      // iOS: Use model-viewer for better AR support
+      createIOSModelViewer();
     } else {
       // Desktop/other: Show instruction
       alert('AR is best experienced on mobile devices. Please try on your phone or tablet for the full AR experience!');
     }
+  };
+
+  // iOS-specific model viewer for AR
+  const createIOSModelViewer = () => {
+    // Load model-viewer script if not already loaded
+    if (!document.querySelector('script[src*="model-viewer"]')) {
+      const script = document.createElement('script');
+      script.type = 'module';
+      script.src = 'https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js';
+      document.head.appendChild(script);
+    }
+
+    // Create minimal fullscreen model-viewer
+    const overlay = document.createElement('div');
+    overlay.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: black;
+      z-index: 999999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    `;
+
+    const modelViewer = document.createElement('model-viewer') as any;
+    modelViewer.src = modelPath;
+    modelViewer.setAttribute('ar', '');
+    modelViewer.setAttribute('ar-modes', 'quick-look');
+    modelViewer.setAttribute('ios-src', modelPath);
+    modelViewer.style.cssText = `
+      width: 100%;
+      height: 100%;
+      background: transparent;
+    `;
+
+    // Auto-trigger AR as soon as possible
+    modelViewer.addEventListener('load', () => {
+      setTimeout(() => {
+        if (modelViewer.canActivateAR) {
+          modelViewer.activateAR();
+          // Close overlay once AR starts
+          setTimeout(() => {
+            if (document.body.contains(overlay)) {
+              document.body.removeChild(overlay);
+            }
+          }, 500);
+        }
+      }, 100);
+    });
+
+    overlay.appendChild(modelViewer);
+    document.body.appendChild(overlay);
+
+    // Fallback close after 3 seconds if AR doesn't start
+    setTimeout(() => {
+      if (document.body.contains(overlay)) {
+        document.body.removeChild(overlay);
+      }
+    }, 3000);
   };
 
   // Model Viewer AR - Direct Camera AR Experience
