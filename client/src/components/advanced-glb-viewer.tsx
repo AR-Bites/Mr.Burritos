@@ -72,8 +72,9 @@ export default function AdvancedGLBViewer({ isOpen, onClose, dishName, modelPath
       return;
     }
 
-    // For desktop - explain that AR needs mobile
-    alert(`AR works best on mobile!\n\nTo see "${dishName}" in your space:\n• iPhone/iPad: Native AR experience\n• Android: Google AR viewer\n\nPlease try on your phone! 📱`);
+    // For all other devices - just show message, no AR attempt
+    console.log('🌐 Device not supported for AR');
+    alert(`AR viewing is only supported on iOS and Android devices.\n\nTo see "${dishName}" in your space:\n• iPhone/iPad: Use Safari browser\n• Android: Use Chrome browser\n\nPlease try on a supported mobile device! 📱`);
   };
 
   // Advanced AR with plane detection and realistic placement
