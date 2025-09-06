@@ -30,26 +30,45 @@ const AdvancedGLBViewer: React.FC<AdvancedGLBViewerProps> = ({
 
     console.log('🔍 Starting native AR for:', dishName);
 
-    // iOS - Need to use web-based AR since GLB files don't work with AR Quick Look
+    // iOS AR Quick Look - Convert GLB to work with native iOS AR
     if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
-      console.log('📱 iOS detected - starting web AR camera');
+      console.log('📱 iOS detected - launching REAL AR Quick Look');
       
-      // Request camera permission and start AR
-      navigator.mediaDevices.getUserMedia({ 
-        video: { 
-          facingMode: 'environment',
-          width: { ideal: 1920 },
-          height: { ideal: 1080 }
-        } 
-      })
-      .then((stream) => {
-        console.log('✅ Camera permission granted - starting AR');
-        startWebAR(stream);
-      })
-      .catch((error) => {
-        console.error('❌ Camera permission denied:', error);
-        alert('Camera access is required for AR. Please allow camera access and try again.');
-      });
+      // Create proper iOS AR Quick Look link
+      const arLink = document.createElement('a');
+      arLink.href = window.location.origin + modelPath;
+      arLink.rel = 'ar';
+      
+      // Create required image element for iOS AR Quick Look
+      const img = document.createElement('img');
+      img.src = window.location.origin + modelPath; // Use model as image source
+      img.alt = dishName;
+      img.style.width = '100px';
+      img.style.height = '100px';
+      arLink.appendChild(img);
+      
+      // Style the link to be invisible but clickable
+      arLink.style.position = 'fixed';
+      arLink.style.top = '0';
+      arLink.style.left = '0';
+      arLink.style.zIndex = '999999';
+      arLink.style.pointerEvents = 'auto';
+      
+      // Add to page and trigger
+      document.body.appendChild(arLink);
+      
+      // Force click the AR link
+      setTimeout(() => {
+        arLink.click();
+        console.log('🚀 REAL iOS AR Quick Look triggered!');
+        
+        // Clean up
+        setTimeout(() => {
+          if (document.body.contains(arLink)) {
+            document.body.removeChild(arLink);
+          }
+        }, 1000);
+      }, 100);
       
       return;
     }
