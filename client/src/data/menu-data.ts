@@ -346,5 +346,335 @@ export const MENU_ITEMS: MenuItem[] = [
     ingredients: ["beef patty", "BBQ sauce", "burger bun", "lettuce", "tomato", "cheese"],
     isAvailable: true,
     modelPath: "/attached_assets/Mushroom_and_Mr_Smokey_Burgers(Burgers_Category)_1757009563301.glb"
+  },
+
+  // 🌟 FAVORITES
+  {
+    id: "21",
+    name: "Dynamite Bowl",
+    description: "Explosive flavors in a bowl with rice, beans, and signature dynamite sauce",
+    price: "5.25 JD",
+    category: CATEGORIES.FAVORITES,
+    imageUrl: "https://images.unsplash.com/photo-1563379091339-03246963d96c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+    spiceLevel: 3,
+    isVegetarian: false,
+    isVegan: false,
+    isGlutenFree: true,
+    ingredients: ["rice", "black beans", "chicken", "dynamite sauce", "corn", "lettuce"],
+    isAvailable: true,
+    modelPath: "/attached_assets/Dynamite_Bowl(Favorites_Category)_1757009297747.glb"
+  },
+  {
+    id: "22",
+    name: "Fajita Platter",
+    description: "Sizzling fajita platter with grilled meat, peppers, and warm tortillas",
+    price: "6.75 JD",
+    category: CATEGORIES.FAVORITES,
+    imageUrl: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+    spiceLevel: 2,
+    isVegetarian: false,
+    isVegan: false,
+    isGlutenFree: false,
+    ingredients: ["grilled beef", "bell peppers", "onions", "tortillas", "guacamole", "sour cream"],
+    isAvailable: true,
+    modelPath: "/attached_assets/Fajita_Platter(Favorites_Category)_1757009365917.glb"
+  },
+  {
+    id: "23",
+    name: "Quesadilla",
+    description: "Grilled tortilla filled with cheese and your choice of meat",
+    price: "3.95 JD",
+    category: CATEGORIES.FAVORITES,
+    imageUrl: "https://images.unsplash.com/photo-1618040996337-56904b7850b9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+    spiceLevel: 1,
+    isVegetarian: false,
+    isVegan: false,
+    isGlutenFree: false,
+    ingredients: ["flour tortilla", "cheese", "chicken", "onions", "peppers"],
+    isAvailable: true,
+    modelPath: "/attached_assets/Quesadilla(Favorites_Category)_1757009639433.glb"
+  },
+  {
+    id: "24",
+    name: "Tostada",
+    description: "Crispy tostada shell topped with beans, meat, and fresh toppings",
+    price: "2.85 JD",
+    category: CATEGORIES.FAVORITES,
+    imageUrl: "https://images.unsplash.com/photo-1565299507177-b0ac66763828?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+    spiceLevel: 1,
+    isVegetarian: false,
+    isVegan: false,
+    isGlutenFree: true,
+    ingredients: ["crispy tortilla", "refried beans", "ground beef", "lettuce", "cheese", "tomato"],
+    isAvailable: true,
+    modelPath: "/attached_assets/Tostada(Favorites_Category)_1757010402694.glb"
+  },
+
+  // 🍟 SIDES
+  {
+    id: "25",
+    name: "Mexican Fries",
+    description: "Golden fries topped with cheese, jalapeños, and Mexican spices",
+    price: "2.95 JD",
+    category: CATEGORIES.SIDES,
+    imageUrl: "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+    spiceLevel: 2,
+    isVegetarian: true,
+    isVegan: false,
+    isGlutenFree: true,
+    ingredients: ["french fries", "cheese sauce", "jalapeños", "Mexican seasoning"],
+    isAvailable: true,
+    modelPath: "/attached_assets/Mexican_Fries(Sides_Category)_1757009528617.glb"
+  },
+  {
+    id: "26",
+    name: "Nachos",
+    description: "Crispy tortilla chips with melted cheese and fresh toppings",
+    price: "3.75 JD",
+    category: CATEGORIES.SIDES,
+    imageUrl: "https://images.unsplash.com/photo-1513456852971-30c0b8199d4d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+    spiceLevel: 2,
+    isVegetarian: true,
+    isVegan: false,
+    isGlutenFree: true,
+    ingredients: ["tortilla chips", "cheese", "jalapeños", "sour cream", "guacamole"],
+    isAvailable: true,
+    modelPath: "/attached_assets/Nachos(Sides_Category)_1757009627864.glb"
+  },
+  {
+    id: "27",
+    name: "Garlic Tortilla",
+    description: "Warm tortilla brushed with garlic butter and herbs",
+    price: "1.50 JD",
+    category: CATEGORIES.SIDES,
+    imageUrl: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+    spiceLevel: 0,
+    isVegetarian: true,
+    isVegan: false,
+    isGlutenFree: false,
+    ingredients: ["flour tortilla", "garlic butter", "herbs"],
+    isAvailable: true,
+    modelPath: "/attached_assets/Garlic_Tortilla(Sides_Category)_1757009382662.glb"
+  },
+
+  // 👶 KIDS MEALS
+  {
+    id: "28",
+    name: "Kids Hard Taco",
+    description: "Kid-sized hard taco with mild chicken and cheese",
+    price: "2.25 JD",
+    category: CATEGORIES.KIDS,
+    imageUrl: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+    spiceLevel: 0,
+    isVegetarian: false,
+    isVegan: false,
+    isGlutenFree: false,
+    ingredients: ["hard taco shell", "mild chicken", "cheese", "lettuce"],
+    isAvailable: true,
+    modelPath: "/attached_assets/Hard_Taco(Kids_Meals_Category)_1757009504270.glb"
+  },
+  {
+    id: "29",
+    name: "Kids Soft Taco",
+    description: "Kid-sized soft taco with mild chicken and cheese",
+    price: "2.50 JD",
+    category: CATEGORIES.KIDS,
+    imageUrl: "https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+    spiceLevel: 0,
+    isVegetarian: false,
+    isVegan: false,
+    isGlutenFree: false,
+    ingredients: ["soft tortilla", "mild chicken", "cheese", "lettuce"],
+    isAvailable: true,
+    modelPath: "/attached_assets/Taco_Soft(Kids_Meals_Catgories)_1757009677820.glb"
+  },
+  {
+    id: "30",
+    name: "Kids Chicken Tenders",
+    description: "Crispy chicken tenders served with kid-friendly sides",
+    price: "3.25 JD",
+    category: CATEGORIES.KIDS,
+    imageUrl: "https://images.unsplash.com/photo-1562967916-eb82221dfb92?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+    spiceLevel: 0,
+    isVegetarian: false,
+    isVegan: false,
+    isGlutenFree: false,
+    ingredients: ["chicken tenders", "fries", "ranch sauce"],
+    isAvailable: true,
+    modelPath: "/attached_assets/Tenders(Kids_Meals_Category)_1757009691845.glb"
+  },
+
+  // 🥗 HEALTHY CORNER
+  {
+    id: "31",
+    name: "Healthy Platter",
+    description: "Fresh and nutritious platter with grilled proteins and vegetables",
+    price: "6.50 JD",
+    category: CATEGORIES.HEALTHY_CORNER,
+    imageUrl: "https://images.unsplash.com/photo-1546793665-c74683f339c1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+    spiceLevel: 1,
+    isVegetarian: false,
+    isVegan: false,
+    isGlutenFree: true,
+    ingredients: ["grilled chicken", "mixed greens", "tomatoes", "cucumbers", "avocado"],
+    isAvailable: true,
+    modelPath: "/attached_assets/Healthy_Platter(Healthy_Corner_Category)_1757009513885.glb"
+  },
+  {
+    id: "32",
+    name: "Taco Salad",
+    description: "Fresh salad served in a crispy taco shell with healthy toppings",
+    price: "4.75 JD",
+    category: CATEGORIES.HEALTHY_CORNER,
+    imageUrl: "https://images.unsplash.com/photo-1540420773420-3366772f4999?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+    spiceLevel: 1,
+    isVegetarian: false,
+    isVegan: false,
+    isGlutenFree: true,
+    ingredients: ["crispy taco shell", "mixed greens", "grilled chicken", "black beans", "corn", "avocado"],
+    isAvailable: true,
+    modelPath: "/attached_assets/Taco_Salad(Healthy_Corner_Category)_1757010391057.glb"
+  },
+
+  // 🌱 VEGETARIAN
+  {
+    id: "33",
+    name: "Vegetarian Burrito",
+    description: "Hearty burrito filled with beans, rice, vegetables, and cheese",
+    price: "4.25 JD",
+    category: CATEGORIES.VEGETARIAN,
+    imageUrl: "https://images.unsplash.com/photo-1626700051175-6818013e1d4f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+    spiceLevel: 1,
+    isVegetarian: true,
+    isVegan: false,
+    isGlutenFree: false,
+    ingredients: ["black beans", "rice", "bell peppers", "onions", "cheese", "flour tortilla"],
+    isAvailable: true,
+    modelPath: "/attached_assets/Vegetarian_Burrito(Vegetarian_Category)_1757009704097.glb"
+  },
+
+  // 🎁 OFFERS
+  {
+    id: "34",
+    name: "Taco Kit",
+    description: "Complete taco kit with shells, meat, and all the fixings",
+    price: "12.95 JD",
+    category: CATEGORIES.OFFERS,
+    imageUrl: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+    spiceLevel: 2,
+    isVegetarian: false,
+    isVegan: false,
+    isGlutenFree: false,
+    ingredients: ["taco shells", "seasoned beef", "cheese", "lettuce", "tomatoes", "sour cream"],
+    isAvailable: true,
+    modelPath: "/attached_assets/Taco_Kit(Offers_Category)_1757009658196.glb"
+  },
+
+  // 🥤 DRINKS
+  {
+    id: "35",
+    name: "Fresh Horchata",
+    description: "Traditional Mexican rice drink with cinnamon",
+    price: "2.25 JD",
+    category: CATEGORIES.DRINKS,
+    imageUrl: "https://images.unsplash.com/photo-1571091718767-18b5b1457add?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+    spiceLevel: 0,
+    isVegetarian: true,
+    isVegan: true,
+    isGlutenFree: true,
+    ingredients: ["rice milk", "cinnamon", "vanilla", "sugar"],
+    isAvailable: true
+  },
+  {
+    id: "36",
+    name: "Agua Fresca",
+    description: "Refreshing fruit water with natural flavors",
+    price: "1.95 JD",
+    category: CATEGORIES.DRINKS,
+    imageUrl: "https://images.unsplash.com/photo-1544145945-f90425340c7e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+    spiceLevel: 0,
+    isVegetarian: true,
+    isVegan: true,
+    isGlutenFree: true,
+    ingredients: ["fresh fruit", "water", "lime", "sugar"],
+    isAvailable: true
+  },
+
+  // 🌶️ SAUCES
+  {
+    id: "37",
+    name: "Salsa Verde",
+    description: "Tangy green salsa made with tomatillos and jalapeños",
+    price: "0.75 JD",
+    category: CATEGORIES.SAUCES,
+    imageUrl: "https://images.unsplash.com/photo-1582169296193-986ef43b0ff2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+    spiceLevel: 2,
+    isVegetarian: true,
+    isVegan: true,
+    isGlutenFree: true,
+    ingredients: ["tomatillos", "jalapeños", "onion", "cilantro", "lime"],
+    isAvailable: true
+  },
+  {
+    id: "38",
+    name: "Chipotle Sauce",
+    description: "Smoky and spicy sauce made with chipotle peppers",
+    price: "0.85 JD",
+    category: CATEGORIES.SAUCES,
+    imageUrl: "https://images.unsplash.com/photo-1582169296193-986ef43b0ff2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+    spiceLevel: 3,
+    isVegetarian: true,
+    isVegan: true,
+    isGlutenFree: true,
+    ingredients: ["chipotle peppers", "tomatoes", "onion", "garlic", "vinegar"],
+    isAvailable: true
+  },
+
+  // 🥟 APPETIZERS
+  {
+    id: "39",
+    name: "Mexican Street Corn",
+    description: "Grilled corn on the cob with mayo, cheese, and chili powder",
+    price: "2.50 JD",
+    category: CATEGORIES.APPETIZERS,
+    imageUrl: "https://images.unsplash.com/photo-1571091718767-18b5b1457add?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+    spiceLevel: 1,
+    isVegetarian: true,
+    isVegan: false,
+    isGlutenFree: true,
+    ingredients: ["corn", "mayonnaise", "cotija cheese", "chili powder", "lime"],
+    isAvailable: true
+  },
+
+  // 🍽️ MAINS
+  {
+    id: "40",
+    name: "Carne Asada Plate",
+    description: "Grilled marinated steak served with rice, beans, and tortillas",
+    price: "8.95 JD",
+    category: CATEGORIES.MAINS,
+    imageUrl: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+    spiceLevel: 2,
+    isVegetarian: false,
+    isVegan: false,
+    isGlutenFree: true,
+    ingredients: ["grilled steak", "rice", "black beans", "tortillas", "pico de gallo"],
+    isAvailable: true
+  },
+
+  // 🍰 DESSERTS
+  {
+    id: "41",
+    name: "Tres Leches Cake",
+    description: "Traditional Mexican sponge cake soaked in three types of milk",
+    price: "3.50 JD",
+    category: CATEGORIES.DESSERTS,
+    imageUrl: "https://images.unsplash.com/photo-1565958011703-44f9829ba187?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+    spiceLevel: 0,
+    isVegetarian: true,
+    isVegan: false,
+    isGlutenFree: false,
+    ingredients: ["sponge cake", "evaporated milk", "condensed milk", "heavy cream", "cinnamon"],
+    isAvailable: true
   }
 ];
