@@ -56,7 +56,7 @@ export default function AdvancedGLBViewer({ isOpen, onClose, dishName, modelPath
     
     // Set realistic starting size for AR - but keep it scalable!
     hiddenModelViewer.setAttribute('ar-scale', 'auto'); // Allow user scaling/zooming
-    hiddenModelViewer.setAttribute('scale', '0.02 0.02 0.02'); // Start at 2% of original size - MUCH smaller!
+    hiddenModelViewer.setAttribute('scale', '0.005 0.005 0.005'); // Start at 0.5% of original size
     
     // Set realistic placement options  
     hiddenModelViewer.setAttribute('ar-placement', 'floor wall');
