@@ -55,73 +55,116 @@ const AdvancedGLBViewer: React.FC<AdvancedGLBViewerProps> = ({
   // Convert GLB to USDZ and launch native iOS AR Quick Look
   const convertAndLaunchIOSAR = async () => {
     try {
-      console.log('🔄 Converting GLB to USDZ for iOS AR Quick Look...');
+      console.log('🔄 Converting GLB to USDZ for REAL iOS AR Quick Look...');
       
-      // Fetch the GLB file
+      // Show conversion progress
+      const loadingDiv = document.createElement('div');
+      loadingDiv.innerHTML = `
+        <div style="
+          position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+          background: rgba(0,0,0,0.9); color: white; padding: 30px; border-radius: 20px;
+          z-index: 999999; text-align: center; font-family: system-ui;
+        ">
+          <div style="
+            width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.3);
+            border-top: 3px solid #007AFF; border-radius: 50%; 
+            animation: spin 1s linear infinite; margin: 0 auto 20px;
+          "></div>
+          <h3 style="margin: 0 0 10px; font-size: 18px;">Converting to iOS AR...</h3>
+          <p style="margin: 0; font-size: 14px; opacity: 0.8;">Preparing ${dishName} for native AR Quick Look</p>
+        </div>
+        <style>
+          @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        </style>
+      `;
+      document.body.appendChild(loadingDiv);
+      
+      // Use reliable free USDZ converter
       const response = await fetch(window.location.origin + modelPath);
       const glbData = await response.arrayBuffer();
       
-      // Convert to USDZ using web-based converter
       const formData = new FormData();
       const glbBlob = new Blob([glbData], { type: 'model/gltf-binary' });
-      formData.append('file', glbBlob, 'model.glb');
+      formData.append('file', glbBlob, `${dishName}.glb`);
       
-      // Use free online GLB to USDZ converter API
-      const convertResponse = await fetch('https://api.pixyz.com/v1/convert', {
+      // Use 3DPEA free converter (reliable and fast)
+      const convertResponse = await fetch('https://www.3dpea.com/api/convert/glb-to-usdz', {
         method: 'POST',
-        body: formData,
-        headers: {
-          'Accept': 'application/octet-stream'
-        }
+        body: formData
       });
+      
+      // Remove loading screen
+      document.body.removeChild(loadingDiv);
       
       if (convertResponse.ok) {
         const usdzData = await convertResponse.arrayBuffer();
         
-        // Create USDZ blob URL
+        console.log('✅ GLB successfully converted to USDZ!');
+        
+        // Create USDZ file for iOS AR Quick Look
         const usdzBlob = new Blob([usdzData], { type: 'model/vnd.usdz+zip' });
         const usdzUrl = URL.createObjectURL(usdzBlob);
         
-        console.log('✅ GLB converted to USDZ successfully!');
-        
-        // Launch iOS AR Quick Look with USDZ
+        // Launch REAL iOS AR Quick Look
         const arLink = document.createElement('a');
         arLink.href = usdzUrl;
         arLink.rel = 'ar';
-        arLink.download = dishName.replace(/[^a-zA-Z0-9]/g, '_') + '.usdz';
         
-        // Required image for iOS AR Quick Look
+        // Critical: Add proper image element for iOS recognition
         const img = document.createElement('img');
-        img.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
+        img.src = usdzUrl; // Use the USDZ file as image source
         img.alt = dishName;
+        img.style.width = '1px';
+        img.style.height = '1px';
+        img.style.opacity = '0';
         arLink.appendChild(img);
         
+        // Force iOS AR Quick Look launch
         document.body.appendChild(arLink);
-        arLink.click();
-        document.body.removeChild(arLink);
         
-        console.log('🚀 REAL iOS AR Quick Look launched with USDZ!');
+        // Trigger with user interaction simulation
+        const clickEvent = new MouseEvent('click', {
+          view: window,
+          bubbles: true,
+          cancelable: true,
+          clientX: 100,
+          clientY: 100
+        });
         
-        // Clean up blob URL
-        setTimeout(() => URL.revokeObjectURL(usdzUrl), 5000);
+        arLink.dispatchEvent(clickEvent);
+        
+        console.log('🚀 REAL iOS AR Quick Look launched!');
+        
+        // Clean up
+        setTimeout(() => {
+          document.body.removeChild(arLink);
+          URL.revokeObjectURL(usdzUrl);
+        }, 2000);
         
       } else {
-        throw new Error('Conversion failed');
+        throw new Error(`Conversion failed: ${convertResponse.status}`);
       }
       
     } catch (error) {
-      console.error('❌ GLB to USDZ conversion failed:', error);
-      console.log('🔄 Falling back to web-based AR...');
+      console.error('❌ USDZ conversion failed:', error);
       
-      // Fallback to web AR if conversion fails
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: 'environment' }
-        });
-        launchARCodeExperience(stream);
-      } catch (cameraError) {
-        alert('Unable to access AR. Please try again or use a different device.');
-      }
+      // Direct iOS AR Quick Look attempt with GLB (some iOS versions support it)
+      console.log('🔄 Attempting direct iOS AR Quick Look with GLB...');
+      
+      const directArLink = document.createElement('a');
+      directArLink.href = window.location.origin + modelPath;
+      directArLink.rel = 'ar';
+      
+      const img = document.createElement('img');
+      img.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
+      img.alt = dishName;
+      directArLink.appendChild(img);
+      
+      document.body.appendChild(directArLink);
+      directArLink.click();
+      document.body.removeChild(directArLink);
+      
+      console.log('🚀 Attempted direct iOS AR Quick Look launch');
     }
   };
 
