@@ -20,102 +20,106 @@ export default function AdvancedGLBViewer({ isOpen, onClose, dishName, modelPath
   const [loadingMessage, setLoadingMessage] = useState('Preparing your 3D experience...');
   const isMobile = typeof window !== 'undefined' ? window.innerWidth < 768 : false;
 
-  // Direct AR activation without overlay
-  const activateARDirectly = () => {
+  // Handle AR View - Direct Camera AR Experience
+  const handleViewInSpace = () => {
     if (!modelPath) {
       alert('3D model not available for AR view');
       return;
     }
 
-    // Close current modal first
-    onClose();
-
-    // Directly activate AR based on device
-    if (/Android/i.test(navigator.userAgent)) {
-      // Android: Google Scene Viewer
-      const sceneViewerUrl = `https://arvr.google.com/scene-viewer/1.0?file=${encodeURIComponent(window.location.origin + modelPath)}&mode=ar_only&title=${encodeURIComponent(dishName)}`;
-      window.open(sceneViewerUrl, '_blank');
-    } else if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
-      // iOS: AR Quick Look - ALWAYS TRY
-      const link = document.createElement('a');
-      link.href = modelPath;
-      link.rel = 'ar';
-      link.style.display = 'none';
-      
-      const img = document.createElement('img');
-      img.alt = dishName;
-      link.appendChild(img);
-      
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } else {
-      // Desktop/other: Show instruction
-      alert('AR is best experienced on mobile devices. Please try on your phone or tablet for the full AR experience!');
-    }
+    // Directly activate AR without preview - like your reference project
+    activateARDirectly();
   };
 
-  // iOS-specific model viewer for AR
-  const createIOSModelViewer = () => {
+  // Directly activate AR camera without intermediate preview
+  const activateARDirectly = () => {
     // Load model-viewer script if not already loaded
     if (!document.querySelector('script[src*="model-viewer"]')) {
       const script = document.createElement('script');
       script.type = 'module';
       script.src = 'https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js';
       document.head.appendChild(script);
+      
+      // Wait for script to load, then activate AR
+      script.onload = () => {
+        setTimeout(() => activateARDirectly(), 500);
+      };
+      return;
     }
 
-    // Create minimal fullscreen model-viewer
-    const overlay = document.createElement('div');
-    overlay.style.cssText = `
+    // Create hidden model-viewer for instant AR activation
+    const hiddenModelViewer = document.createElement('model-viewer') as any;
+    hiddenModelViewer.src = modelPath;
+    hiddenModelViewer.setAttribute('ar', '');
+    hiddenModelViewer.setAttribute('ar-modes', 'webxr scene-viewer quick-look');
+    hiddenModelViewer.setAttribute('loading', 'eager');
+    
+    // Hide it completely
+    hiddenModelViewer.style.cssText = `
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: black;
-      z-index: 999999;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
+      top: -1000px;
+      left: -1000px;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      pointer-events: none;
     `;
 
-    const modelViewer = document.createElement('model-viewer') as any;
-    modelViewer.src = modelPath;
-    modelViewer.setAttribute('ar', '');
-    modelViewer.setAttribute('ar-modes', 'quick-look');
-    modelViewer.setAttribute('ios-src', modelPath);
-    modelViewer.style.cssText = `
-      width: 100%;
-      height: 100%;
-      background: transparent;
-    `;
+    // Add to DOM temporarily
+    document.body.appendChild(hiddenModelViewer);
 
-    // Auto-trigger AR as soon as possible
-    modelViewer.addEventListener('load', () => {
-      setTimeout(() => {
-        if (modelViewer.canActivateAR) {
-          modelViewer.activateAR();
-          // Close overlay once AR starts
-          setTimeout(() => {
-            if (document.body.contains(overlay)) {
-              document.body.removeChild(overlay);
-            }
-          }, 500);
-        }
-      }, 100);
-    });
-
-    overlay.appendChild(modelViewer);
-    document.body.appendChild(overlay);
-
-    // Fallback close after 3 seconds if AR doesn't start
+    // Wait a moment for model-viewer to initialize, then trigger AR
     setTimeout(() => {
-      if (document.body.contains(overlay)) {
-        document.body.removeChild(overlay);
+      try {
+        if (hiddenModelViewer.canActivateAR) {
+          // Direct AR activation - opens camera immediately
+          hiddenModelViewer.activateAR();
+        } else {
+          // Fallback for different devices
+          if (/Android/i.test(navigator.userAgent)) {
+            // Android - Google Scene Viewer
+            const sceneViewerUrl = `https://arvr.google.com/scene-viewer/1.0?file=${encodeURIComponent(window.location.origin + modelPath!)}&mode=ar_only&title=${encodeURIComponent(dishName)}`;
+            window.open(sceneViewerUrl, '_blank');
+          } else if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+            // iOS - AR Quick Look
+            const link = document.createElement('a');
+            link.href = modelPath!;
+            link.rel = 'ar';
+            link.appendChild(document.createElement('img'));
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+          } else {
+            // Desktop/unsupported - show helpful message
+            alert('AR is best experienced on mobile devices. Please try this on your phone or tablet!');
+          }
+        }
+      } catch (error) {
+        console.error('AR activation failed:', error);
+        // Fallback to device-specific AR
+        if (/Android/i.test(navigator.userAgent)) {
+          const sceneViewerUrl = `https://arvr.google.com/scene-viewer/1.0?file=${encodeURIComponent(window.location.origin + modelPath!)}&mode=ar_only&title=${encodeURIComponent(dishName)}`;
+          window.open(sceneViewerUrl, '_blank');
+        } else if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+          const link = document.createElement('a');
+          link.href = modelPath!;
+          link.rel = 'ar';
+          link.appendChild(document.createElement('img'));
+          link.style.display = 'none';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }
       }
-    }, 3000);
+
+      // Clean up hidden element after a delay
+      setTimeout(() => {
+        if (document.body.contains(hiddenModelViewer)) {
+          document.body.removeChild(hiddenModelViewer);
+        }
+      }, 2000);
+    }, 1000);
   };
 
   // Model Viewer AR - Direct Camera AR Experience
@@ -973,7 +977,7 @@ export default function AdvancedGLBViewer({ isOpen, onClose, dishName, modelPath
             
             {modelPath && (
               <button
-                onClick={activateARDirectly}
+                onClick={handleViewInSpace}
                 style={{
                   background: 'linear-gradient(135deg, #000000, #1a1a1a)',
                   color: '#ffffff',
