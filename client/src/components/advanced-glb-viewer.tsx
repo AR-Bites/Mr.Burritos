@@ -21,104 +21,63 @@ const AdvancedGLBViewer: React.FC<AdvancedGLBViewerProps> = ({
   const [loadingMessage, setLoadingMessage] = useState('Preparing your 3D experience...');
   const isMobile = typeof window !== 'undefined' ? window.innerWidth < 768 : false;
 
-  // Direct iOS AR Quick Look - Native AR Experience
-  const handleViewInSpace = () => {
+  // AR Code Style Experience - Button Click → Instant AR Camera
+  const handleViewInSpace = async () => {
     if (!modelPath) {
       alert('3D model not available for AR view');
       return;
     }
 
-    console.log('🔍 Starting native AR for:', dishName);
+    console.log('🔍 Starting AR Code style experience for:', dishName);
 
-    // iOS AR Quick Look - Convert GLB to work with native iOS AR
-    if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
-      console.log('📱 iOS detected - launching REAL AR Quick Look');
+    try {
+      // Request camera permission (like AR Code app does)
+      console.log('📷 Requesting camera access...');
       
-      // Create proper iOS AR Quick Look link
-      const arLink = document.createElement('a');
-      arLink.href = window.location.origin + modelPath;
-      arLink.rel = 'ar';
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: 'environment', // Back camera for AR
+          width: { ideal: 1920, min: 1280 },
+          height: { ideal: 1080, min: 720 }
+        }
+      });
+
+      console.log('✅ Camera access granted! Launching AR experience...');
       
-      // Create required image element for iOS AR Quick Look
-      const img = document.createElement('img');
-      img.src = window.location.origin + modelPath; // Use model as image source
-      img.alt = dishName;
-      img.style.width = '100px';
-      img.style.height = '100px';
-      arLink.appendChild(img);
-      
-      // Style the link to be invisible but clickable
-      arLink.style.position = 'fixed';
-      arLink.style.top = '0';
-      arLink.style.left = '0';
-      arLink.style.zIndex = '999999';
-      arLink.style.pointerEvents = 'auto';
-      
-      // Add to page and trigger
-      document.body.appendChild(arLink);
-      
-      // Force click the AR link
-      setTimeout(() => {
-        arLink.click();
-        console.log('🚀 REAL iOS AR Quick Look triggered!');
-        
-        // Clean up
-        setTimeout(() => {
-          if (document.body.contains(arLink)) {
-            document.body.removeChild(arLink);
-          }
-        }, 1000);
-      }, 100);
-      
-      return;
+      // Immediately launch full-screen AR camera (like AR Code)
+      launchARCodeExperience(stream);
+
+    } catch (error) {
+      console.error('❌ Camera access denied:', error);
+      alert('Camera access is required for AR. Please allow camera access to view your 3D model in space!');
     }
-
-    // Android - Google Scene Viewer
-    if (/Android/i.test(navigator.userAgent)) {
-      console.log('🤖 Android detected - using Google Scene Viewer');
-      
-      const modelUrl = encodeURIComponent(window.location.origin + modelPath);
-      const sceneViewerUrl = `https://arvr.google.com/scene-viewer/1.0?file=${modelUrl}&mode=ar_only&title=${encodeURIComponent(dishName)}`;
-      
-      window.open(sceneViewerUrl, '_blank');
-      console.log('🚀 Google Scene Viewer launched!');
-      return;
-    }
-
-    // Other devices
-    alert('AR viewing requires iOS (iPhone/iPad) or Android with AR support. Please try on a mobile device with Safari or Chrome.');
   };
 
-  // Start web-based AR camera experience
-  const startWebAR = (stream: MediaStream) => {
-    console.log('🎥 Starting web AR camera');
+  // Launch AR Code Style Experience - Full Screen AR Camera
+  const launchARCodeExperience = (stream: MediaStream) => {
+    console.log('🚀 Launching AR Code style experience!');
     
-    // Create full-screen AR overlay
+    // Create full-screen AR overlay (like AR Code app)
     const arOverlay = document.createElement('div');
-    arOverlay.style.position = 'fixed';
-    arOverlay.style.top = '0';
-    arOverlay.style.left = '0';
-    arOverlay.style.width = '100%';
-    arOverlay.style.height = '100%';
-    arOverlay.style.backgroundColor = 'black';
-    arOverlay.style.zIndex = '999999';
+    arOverlay.style.cssText = `
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: black; z-index: 999999; display: flex; flex-direction: column;
+    `;
     
-    // Create camera video
+    // Camera video background
     const video = document.createElement('video');
     video.srcObject = stream;
-    video.style.width = '100%';
-    video.style.height = '100%';
-    video.style.objectFit = 'cover';
+    video.style.cssText = `
+      width: 100%; height: 100%; object-fit: cover;
+    `;
     video.autoplay = true;
     video.playsInline = true;
     
-    // Create 3D canvas overlay
+    // 3D canvas overlay for AR model
     const canvas = document.createElement('canvas');
-    canvas.style.position = 'absolute';
-    canvas.style.top = '0';
-    canvas.style.left = '0';
-    canvas.style.width = '100%';
-    canvas.style.height = '100%';
+    canvas.style.cssText = `
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    `;
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
     
@@ -127,77 +86,88 @@ const AdvancedGLBViewer: React.FC<AdvancedGLBViewerProps> = ({
     const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 20);
     const renderer = new THREE.WebGLRenderer({ canvas, alpha: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setClearColor(0x000000, 0);
+    renderer.setClearColor(0x000000, 0); // Transparent
     
-    // Lighting
+    // AR lighting
     scene.add(new THREE.AmbientLight(0xffffff, 0.6));
     const light = new THREE.DirectionalLight(0xffffff, 0.8);
     light.position.set(5, 10, 5);
     scene.add(light);
     
-    // Load 3D model
+    // Load 3D model for AR
     const loader = new GLTFLoader();
     let arModel: THREE.Group | null = null;
     
     loader.load(modelPath!, (gltf) => {
-      console.log('✅ 3D model loaded for AR');
+      console.log('✅ 3D model loaded for AR Code experience');
       
       const model = gltf.scene;
       const box = new THREE.Box3().setFromObject(model);
       const size = box.getSize(new THREE.Vector3());
-      const scale = 0.3 / Math.max(size.x, size.y, size.z);
+      const scale = 0.4 / Math.max(size.x, size.y, size.z); // Perfect AR size
       model.scale.setScalar(scale);
-      model.position.set(0, -0.5, -1.5);
+      model.position.set(0, -0.3, -1.2); // Position in front of camera
       
       arModel = new THREE.Group();
       arModel.add(model);
       scene.add(arModel);
+      
+      console.log('🍔 3D model placed in AR space!');
     });
     
-    // Close button
+    // AR Code style close button
     const closeBtn = document.createElement('button');
-    closeBtn.innerHTML = '✕ Exit AR';
+    closeBtn.innerHTML = '✕';
     closeBtn.style.cssText = `
-      position: absolute; top: 20px; right: 20px; z-index: 1000000;
-      background: rgba(0,0,0,0.8); color: white; border: 1px solid white;
-      padding: 12px 20px; border-radius: 25px; font-size: 16px; cursor: pointer;
+      position: absolute; top: 30px; right: 30px; z-index: 1000000;
+      width: 50px; height: 50px; border-radius: 25px;
+      background: rgba(0,0,0,0.7); color: white; border: 2px solid white;
+      font-size: 20px; font-weight: bold; cursor: pointer;
     `;
     closeBtn.onclick = () => {
       stream.getTracks().forEach(track => track.stop());
       document.body.removeChild(arOverlay);
+      console.log('🔚 AR Code experience ended');
     };
     
-    // Instructions
+    // AR Code style instructions
     const instructions = document.createElement('div');
     instructions.innerHTML = `
-      <div style="color: white; text-align: center; padding: 20px; background: rgba(0,0,0,0.8); border-radius: 15px;">
-        <h3 style="margin: 0 0 10px; font-size: 18px;">🍔 ${dishName} in AR!</h3>
-        <p style="margin: 0; font-size: 14px;">Move your phone to see it from different angles</p>
+      <div style="
+        color: white; text-align: center; padding: 15px 20px;
+        background: rgba(0,0,0,0.8); border-radius: 20px;
+        border: 2px solid rgba(255,255,255,0.3);
+      ">
+        <h3 style="margin: 0 0 8px; font-size: 18px; font-weight: bold;">🍔 ${dishName}</h3>
+        <p style="margin: 0; font-size: 14px; opacity: 0.9;">Move your phone to explore in AR</p>
       </div>
     `;
     instructions.style.cssText = `
-      position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
-      z-index: 1000000; max-width: 300px;
+      position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+      z-index: 1000000; max-width: 320px;
     `;
     
-    // Assemble AR view
+    // Assemble AR experience
     arOverlay.appendChild(video);
     arOverlay.appendChild(canvas);
     arOverlay.appendChild(closeBtn);
     arOverlay.appendChild(instructions);
     document.body.appendChild(arOverlay);
     
-    // Animation loop
+    // AR animation loop
     const animate = () => {
       requestAnimationFrame(animate);
+      
+      // Gentle rotation for realism
       if (arModel) {
-        arModel.rotation.y += 0.01;
+        arModel.rotation.y += 0.008;
       }
+      
       renderer.render(scene, camera);
     };
     animate();
     
-    console.log('🚀 AR camera experience started!');
+    console.log('🎬 AR Code experience launched successfully!');
   };
 
   useEffect(() => {
@@ -220,17 +190,16 @@ const AdvancedGLBViewer: React.FC<AdvancedGLBViewerProps> = ({
     );
     camera.position.set(3, 2, 3);
 
-    // Renderer setup - Optimized for faster rendering
+    // Renderer setup
     const renderer = new THREE.WebGLRenderer({ 
-      antialias: !isMobile, // Disable on mobile for performance
+      antialias: !isMobile,
       alpha: true,
       powerPreference: 'high-performance'
     });
     renderer.setSize(containerRef.current.clientWidth, containerRef.current.clientHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Cap pixel ratio for performance
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setClearColor(0x000000, 0);
     
-    // Enable shadows only if not mobile for better performance
     if (!isMobile) {
       renderer.shadowMap.enabled = true;
       renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -239,7 +208,7 @@ const AdvancedGLBViewer: React.FC<AdvancedGLBViewerProps> = ({
     containerRef.current.appendChild(renderer.domElement);
     rendererRef.current = renderer;
 
-    // Enhanced lighting for better visibility
+    // Enhanced lighting
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
     scene.add(ambientLight);
 
@@ -252,7 +221,6 @@ const AdvancedGLBViewer: React.FC<AdvancedGLBViewerProps> = ({
     }
     scene.add(directionalLight);
 
-    // Additional fill lights
     const fillLight1 = new THREE.DirectionalLight(0xffffff, 0.3);
     fillLight1.position.set(-5, 5, -5);
     scene.add(fillLight1);
@@ -261,7 +229,7 @@ const AdvancedGLBViewer: React.FC<AdvancedGLBViewerProps> = ({
     fillLight2.position.set(0, -5, 5);
     scene.add(fillLight2);
 
-    // Load GLB model with better progress tracking and error handling
+    // Load GLB model
     const loader = new GLTFLoader();
     console.log(`📦 Loading model: ${modelPath}`);
     
@@ -284,15 +252,12 @@ const AdvancedGLBViewer: React.FC<AdvancedGLBViewerProps> = ({
         const center = box.getCenter(new THREE.Vector3());
         const size = box.getSize(new THREE.Vector3());
         
-        // Scale to fit nicely in view
         const maxDim = Math.max(size.x, size.y, size.z);
         const scale = 2.5 / maxDim;
         model.scale.setScalar(scale);
         
-        // Center the model
         model.position.sub(center.multiplyScalar(scale));
         
-        // Enable shadows on model if not mobile
         if (!isMobile) {
           model.traverse((child) => {
             if (child instanceof THREE.Mesh) {
@@ -328,19 +293,17 @@ const AdvancedGLBViewer: React.FC<AdvancedGLBViewerProps> = ({
       }
     );
 
-    // Mouse/Touch controls for orbiting
+    // Mouse/Touch controls
     let isDragging = false;
     let previousMousePosition = { x: 0, y: 0 };
     let cameraDistance = Math.sqrt(camera.position.x ** 2 + camera.position.y ** 2 + camera.position.z ** 2);
     
-    // Smooth camera interpolation
     let targetTheta = Math.atan2(camera.position.x, camera.position.z);
     let targetPhi = Math.acos(camera.position.y / cameraDistance);
     let currentTheta = targetTheta;
     let currentPhi = targetPhi;
 
     const updateCamera = () => {
-      // Smooth interpolation
       currentTheta += (targetTheta - currentTheta) * 0.1;
       currentPhi += (targetPhi - currentPhi) * 0.1;
       
@@ -350,9 +313,8 @@ const AdvancedGLBViewer: React.FC<AdvancedGLBViewerProps> = ({
       camera.lookAt(0, 0, 0);
     };
 
-    // Optimized animation loop with frame rate limiting
     let lastTime = 0;
-    const frameInterval = 1000 / 30; // 30 FPS cap for better performance
+    const frameInterval = 1000 / 30;
     
     const animate = (currentTime: number) => {
       animationRef.current = requestAnimationFrame(animate);
@@ -366,7 +328,7 @@ const AdvancedGLBViewer: React.FC<AdvancedGLBViewerProps> = ({
       }
     };
 
-    // Mouse events
+    // Event handlers
     const onMouseDown = (event: MouseEvent) => {
       isDragging = true;
       previousMousePosition = { x: event.clientX, y: event.clientY };
@@ -393,7 +355,6 @@ const AdvancedGLBViewer: React.FC<AdvancedGLBViewerProps> = ({
       cameraDistance = Math.max(2, Math.min(10, cameraDistance + event.deltaY * 0.01));
     };
 
-    // Touch events for mobile
     let lastTouchDistance = 0;
     
     const onTouchStart = (event: TouchEvent) => {
@@ -447,7 +408,6 @@ const AdvancedGLBViewer: React.FC<AdvancedGLBViewerProps> = ({
       lastTouchDistance = 0;
     };
 
-    // Handle resize
     const handleResize = () => {
       if (containerRef.current && renderer) {
         camera.aspect = containerRef.current.clientWidth / containerRef.current.clientHeight;
@@ -467,16 +427,13 @@ const AdvancedGLBViewer: React.FC<AdvancedGLBViewerProps> = ({
     canvas.addEventListener('touchend', onTouchEnd);
     window.addEventListener('resize', handleResize);
 
-    // Start animation
     animationRef.current = requestAnimationFrame(animate);
 
     return () => {
-      // Cleanup
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
       }
       
-      // Remove event listeners
       canvas.removeEventListener('mousedown', onMouseDown);
       canvas.removeEventListener('mousemove', onMouseMove);
       canvas.removeEventListener('mouseup', onMouseUp);
@@ -486,7 +443,6 @@ const AdvancedGLBViewer: React.FC<AdvancedGLBViewerProps> = ({
       canvas.removeEventListener('touchend', onTouchEnd);
       window.removeEventListener('resize', handleResize);
       
-      // Cleanup Three.js
       if (rendererRef.current && containerRef.current) {
         containerRef.current.removeChild(rendererRef.current.domElement);
         rendererRef.current.dispose();
@@ -626,57 +582,49 @@ const AdvancedGLBViewer: React.FC<AdvancedGLBViewerProps> = ({
           </div>
         )}
 
-        {/* Controls overlay */}
-        {modelStatus === 'loaded' && (
+        {/* AR Code Style Button */}
+        {modelStatus === 'loaded' && isMobile && (
           <div
             style={{
               position: 'absolute',
-              bottom: '20px',
+              bottom: '30px',
               left: '50%',
               transform: 'translateX(-50%)',
-              display: 'flex',
-              gap: '15px',
-              alignItems: 'center',
-              background: 'rgba(0, 0, 0, 0.8)',
-              padding: '15px 25px',
-              borderRadius: '25px',
-              backdropFilter: 'blur(10px)',
-              border: '1px solid rgba(255, 255, 255, 0.1)'
+              zIndex: 100
             }}
           >
-            {/* AR Button - Only show on mobile */}
-            {isMobile && (
-              <button
-                onClick={handleViewInSpace}
-                style={{
-                  background: 'linear-gradient(135deg, #000000, #1a1a1a)',
-                  color: 'white',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
-                  padding: isMobile ? '12px 18px' : '14px 22px',
-                  borderRadius: '20px',
-                  fontSize: isMobile ? '13px' : '15px',
-                  fontWeight: 'bold',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  transition: 'all 0.2s ease',
-                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)'
-                }}
-                onMouseEnter={(e) => {
-                  const target = e.target as HTMLButtonElement;
-                  target.style.background = 'linear-gradient(135deg, #1a1a1a, #2a2a2a)';
-                  target.style.transform = 'translateY(-1px)';
-                }}
-                onMouseLeave={(e) => {
-                  const target = e.target as HTMLButtonElement;
-                  target.style.background = 'linear-gradient(135deg, #000000, #1a1a1a)';
-                  target.style.transform = 'translateY(0)';
-                }}
-              >
-                View in Your Space
-              </button>
-            )}
+            <button
+              onClick={handleViewInSpace}
+              style={{
+                background: 'linear-gradient(135deg, #007AFF, #0051D5)',
+                color: 'white',
+                border: 'none',
+                padding: '16px 32px',
+                borderRadius: '30px',
+                fontSize: '16px',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
+                transition: 'all 0.3s ease',
+                boxShadow: '0 8px 20px rgba(0, 122, 255, 0.4)',
+                border: '2px solid rgba(255, 255, 255, 0.2)'
+              }}
+              onMouseEnter={(e) => {
+                const target = e.target as HTMLButtonElement;
+                target.style.transform = 'translateY(-2px)';
+                target.style.boxShadow = '0 12px 25px rgba(0, 122, 255, 0.5)';
+              }}
+              onMouseLeave={(e) => {
+                const target = e.target as HTMLButtonElement;
+                target.style.transform = 'translateY(0)';
+                target.style.boxShadow = '0 8px 20px rgba(0, 122, 255, 0.4)';
+              }}
+            >
+              <span style={{ fontSize: '18px' }}>📱</span>
+              View in Your Space
+            </button>
           </div>
         )}
       </div>
