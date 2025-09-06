@@ -36,24 +36,19 @@ export default function AdvancedGLBViewer({ isOpen, onClose, dishName, modelPath
       const sceneViewerUrl = `https://arvr.google.com/scene-viewer/1.0?file=${encodeURIComponent(window.location.origin + modelPath)}&mode=ar_only&title=${encodeURIComponent(dishName)}`;
       window.open(sceneViewerUrl, '_blank');
     } else if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
-      // iOS: Check if we're on localhost
-      if (window.location.hostname === 'localhost' || window.location.hostname.includes('replit')) {
-        alert('🚀 AR works perfectly on the deployed website!\n\nDeploy to Vercel and test there - AR Quick Look needs HTTPS URLs to work properly.');
-      } else {
-        // Production: AR Quick Look
-        const link = document.createElement('a');
-        link.href = modelPath;
-        link.rel = 'ar';
-        link.style.display = 'none';
-        
-        const img = document.createElement('img');
-        img.alt = dishName;
-        link.appendChild(img);
-        
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      }
+      // iOS: AR Quick Look - ALWAYS TRY
+      const link = document.createElement('a');
+      link.href = modelPath;
+      link.rel = 'ar';
+      link.style.display = 'none';
+      
+      const img = document.createElement('img');
+      img.alt = dishName;
+      link.appendChild(img);
+      
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     } else {
       // Desktop/other: Show instruction
       alert('AR is best experienced on mobile devices. Please try on your phone or tablet for the full AR experience!');
