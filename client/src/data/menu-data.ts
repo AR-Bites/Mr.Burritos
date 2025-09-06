@@ -71,7 +71,7 @@ export const MENU_ITEMS: MenuItem[] = [
     isGlutenFree: false,
     ingredients: ["grilled chicken", "soft tortilla", "lettuce", "tomato", "cheese"],
     isAvailable: true,
-    modelPath: "/attached_assets/Hard_Chicken_And_Hard_Beef_Taco(Tacos_Category)_1757009490556.glb"
+    modelPath: "/attached_assets/kids meal soft taco_1756917134815.glb"
   },
   {
     id: "3",
@@ -101,7 +101,7 @@ export const MENU_ITEMS: MenuItem[] = [
     isGlutenFree: false,
     ingredients: ["ground beef", "soft tortilla", "lettuce", "tomato", "cheese"],
     isAvailable: true,
-    modelPath: "/attached_assets/Hard_Chicken_And_Hard_Beef_Taco(Tacos_Category)_1757009490556.glb"
+    modelPath: "/attached_assets/kids meal soft taco_1756917134815.glb"
   },
   {
     id: "5",
@@ -208,7 +208,7 @@ export const MENU_ITEMS: MenuItem[] = [
     isGlutenFree: false,
     ingredients: ["seasoned beef", "rice", "beans", "cheese", "lettuce", "tomato", "flour tortilla"],
     isAvailable: true,
-    modelPath: "/attached_assets/California_Style_Chicken_Or_Beef_Burrito(Burritos_Category)_1757009260552.glb"
+    modelPath: "/attached_assets/13-super burrito beef_1756916814446.glb"
   },
   {
     id: "12",
@@ -223,7 +223,7 @@ export const MENU_ITEMS: MenuItem[] = [
     isGlutenFree: false,
     ingredients: ["carne asada", "french fries", "cheese", "sour cream", "guacamole", "flour tortilla"],
     isAvailable: true,
-    modelPath: "/attached_assets/California_Style_Chicken_Or_Beef_Burrito(Burritos_Category)_1757009260552.glb"
+    modelPath: "/attached_assets/California_Or_Chicken_Burrito(Finished)_1756917128922.glb"
   },
   {
     id: "13",
@@ -283,7 +283,7 @@ export const MENU_ITEMS: MenuItem[] = [
     isGlutenFree: false,
     ingredients: ["turkey", "rice", "beans", "lettuce", "tomato", "flour tortilla"],
     isAvailable: true,
-    modelPath: "/attached_assets/Vegetarian_Burrito(Vegetarian_Category)_1757009704097.glb"
+    modelPath: "/attached_assets/2-fahita burrito_1756916625949.glb"
   },
 
   // 🍔 BURGERS
@@ -676,5 +676,97 @@ export const MENU_ITEMS: MenuItem[] = [
     isGlutenFree: false,
     ingredients: ["sponge cake", "evaporated milk", "condensed milk", "heavy cream", "cinnamon"],
     isAvailable: true
+  },
+
+  // Additional items using available 3D models
+  {
+    id: "42",
+    name: "Dynamite Chicken Fries",
+    description: "Crispy chicken fries with explosive dynamite sauce",
+    price: "3.75 JD",
+    category: CATEGORIES.SIDES,
+    imageUrl: "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+    spiceLevel: 3,
+    isVegetarian: false,
+    isVegan: false,
+    isGlutenFree: false,
+    ingredients: ["chicken fries", "dynamite sauce", "spices"],
+    isAvailable: true,
+    modelPath: "/attached_assets/Dynamite_Chicken_Fries_1757009333112.glb"
+  },
+  {
+    id: "43",
+    name: "Periya Taco",
+    description: "Special large-style taco with premium ingredients",
+    price: "2.95 JD",
+    category: CATEGORIES.TACOS,
+    imageUrl: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+    spiceLevel: 2,
+    isVegetarian: false,
+    isVegan: false,
+    isGlutenFree: false,
+    ingredients: ["premium beef", "soft tortilla", "special sauce", "vegetables"],
+    isAvailable: true,
+    modelPath: "/attached_assets/12-periya taco_1756916784847.glb"
+  },
+  {
+    id: "44",
+    name: "Kids Meal Combo",
+    description: "Complete kids meal with burger and sides",
+    price: "4.25 JD",
+    category: CATEGORIES.KIDS,
+    imageUrl: "https://images.unsplash.com/photo-1562967916-eb82221dfb92?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+    spiceLevel: 0,
+    isVegetarian: false,
+    isVegan: false,
+    isGlutenFree: false,
+    ingredients: ["mini burger", "fries", "drink", "toy"],
+    isAvailable: true,
+    modelPath: "/attached_assets/Kids_Meal_Hard_Taco(Finished)_1756917170405.glb"
+  },
+  {
+    id: "45",
+    name: "Kids Tender Meal",
+    description: "Tender meal specially designed for kids",
+    price: "3.95 JD",
+    category: CATEGORIES.KIDS,
+    imageUrl: "https://images.unsplash.com/photo-1562967916-eb82221dfb92?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+    spiceLevel: 0,
+    isVegetarian: false,
+    isVegan: false,
+    isGlutenFree: false,
+    ingredients: ["chicken tenders", "fries", "ketchup"],
+    isAvailable: true,
+    modelPath: "/attached_assets/Tenders_Kids_Meal(Finished)_1756917229330.glb"
+  },
+  {
+    id: "46",
+    name: "Classic Quesadilla",
+    description: "Traditional cheese quesadilla with perfect crispy tortilla",
+    price: "3.25 JD",
+    category: CATEGORIES.FAVORITES,
+    imageUrl: "https://images.unsplash.com/photo-1618040996337-56904b7850b9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+    spiceLevel: 0,
+    isVegetarian: true,
+    isVegan: false,
+    isGlutenFree: false,
+    ingredients: ["flour tortilla", "cheese blend"],
+    isAvailable: true,
+    modelPath: "/attached_assets/quasedilla_1756917218077.glb"
+  },
+  {
+    id: "47",
+    name: "Vegetarian Special",
+    description: "Special vegetarian burrito with fresh ingredients",
+    price: "4.50 JD",
+    category: CATEGORIES.VEGETARIAN,
+    imageUrl: "https://images.unsplash.com/photo-1626700051175-6818013e1d4f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+    spiceLevel: 1,
+    isVegetarian: true,
+    isVegan: false,
+    isGlutenFree: false,
+    ingredients: ["black beans", "rice", "vegetables", "cheese", "tortilla"],
+    isAvailable: true,
+    modelPath: "/attached_assets/Vegetarian_Burrito(Finished)_1756917243499.glb"
   }
 ];
