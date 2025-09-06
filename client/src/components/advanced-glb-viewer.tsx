@@ -54,11 +54,11 @@ export default function AdvancedGLBViewer({ isOpen, onClose, dishName, modelPath
     hiddenModelViewer.setAttribute('ar-modes', 'webxr scene-viewer quick-look');
     hiddenModelViewer.setAttribute('loading', 'eager');
     
-    // Set realistic food size for AR - scale down significantly
-    hiddenModelViewer.setAttribute('ar-scale', 'fixed');
-    hiddenModelViewer.setAttribute('scale', '0.1 0.1 0.1'); // Make it 10% of original size
+    // Set realistic starting size for AR - but keep it scalable!
+    hiddenModelViewer.setAttribute('ar-scale', 'auto'); // Allow user scaling/zooming
+    hiddenModelViewer.setAttribute('scale', '0.15 0.15 0.15'); // Start at 15% size - still zoomable!
     
-    // Set realistic placement options
+    // Set realistic placement options  
     hiddenModelViewer.setAttribute('ar-placement', 'floor wall');
     hiddenModelViewer.setAttribute('shadow-intensity', '1');
     hiddenModelViewer.setAttribute('shadow-softness', '0.5');
