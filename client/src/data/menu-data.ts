@@ -182,8 +182,8 @@ export const MENU_ITEMS: MenuItem[] = [
   // 🌯 BURRITOS
   {
     id: "10",
-    name: "Super Burrito (Chicken 12\")",
-    description: "Large chicken burrito with rice, beans, cheese, and fresh toppings",
+    name: "California Style Chicken",
+    description: "California-style chicken burrito with rice, beans, and fresh ingredients",
     price: "5.25 JD",
     category: CATEGORIES.BURRITOS,
     imageUrl: "https://images.unsplash.com/photo-1626700051175-6818013e1d4f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
@@ -197,8 +197,8 @@ export const MENU_ITEMS: MenuItem[] = [
   },
   {
     id: "11",
-    name: "Super Burrito (Beef 12\")",
-    description: "Large beef burrito with rice, beans, cheese, and fresh toppings",
+    name: "California Style Beef",
+    description: "California-style beef burrito with rice, beans, and fresh ingredients",
     price: "5.49 JD",
     category: CATEGORIES.BURRITOS,
     imageUrl: "https://images.unsplash.com/photo-1626700051175-6818013e1d4f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
@@ -208,26 +208,41 @@ export const MENU_ITEMS: MenuItem[] = [
     isGlutenFree: false,
     ingredients: ["seasoned beef", "rice", "beans", "cheese", "lettuce", "tomato", "flour tortilla"],
     isAvailable: true,
-    modelPath: "/attached_assets/13-super burrito beef_1756916814446.glb"
+    modelPath: "/attached_assets/California_Style_Chicken_Or_Beef_Burrito(Burritos_Category)_1757009260552.glb"
   },
   {
     id: "12",
-    name: "California Style Burrito 12\"",
-    description: "West coast style burrito with fries inside and premium ingredients",
+    name: "Super Burrito Beef",
+    description: "Large super beef burrito with premium ingredients",
     price: "5.75 JD",
     category: CATEGORIES.BURRITOS,
     imageUrl: "https://images.unsplash.com/photo-1626700051175-6818013e1d4f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-    spiceLevel: 1,
+    spiceLevel: 2,
     isVegetarian: false,
     isVegan: false,
     isGlutenFree: false,
-    ingredients: ["carne asada", "french fries", "cheese", "sour cream", "guacamole", "flour tortilla"],
+    ingredients: ["seasoned beef", "rice", "beans", "cheese", "sour cream", "flour tortilla"],
     isAvailable: true,
-    modelPath: "/attached_assets/California_Or_Chicken_Burrito(Finished)_1756917128922.glb"
+    modelPath: "/attached_assets/13-super burrito beef_1756916814446.glb"
   },
   {
     id: "13",
-    name: "Dynamite Burrito 12\"",
+    name: "Fajita Burrito",
+    description: "Fajita-style burrito with grilled peppers and onions",
+    price: "5.25 JD",
+    category: CATEGORIES.BURRITOS,
+    imageUrl: "https://images.unsplash.com/photo-1626700051175-6818013e1d4f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+    spiceLevel: 2,
+    isVegetarian: false,
+    isVegan: false,
+    isGlutenFree: false,
+    ingredients: ["grilled chicken", "bell peppers", "onions", "rice", "flour tortilla"],
+    isAvailable: true,
+    modelPath: "/attached_assets/2-fahita burrito_1756916625949.glb"
+  },
+  {
+    id: "14",
+    name: "Dynamite Burrito",
     description: "Spicy burrito with dynamite sauce and premium fillings",
     price: "5.99 JD",
     category: CATEGORIES.BURRITOS,
@@ -241,9 +256,9 @@ export const MENU_ITEMS: MenuItem[] = [
     modelPath: "/attached_assets/Dynamite_Burrito(Burritos_Category)_1757009319976.glb"
   },
   {
-    id: "14",
-    name: "Burrito Bowl (Customize your own)",
-    description: "All the burrito goodness in a bowl - fully customizable",
+    id: "15",
+    name: "Burrito Bowl Chicken",
+    description: "All the burrito goodness in a bowl with chicken - fully customizable",
     price: "4.99 JD",
     category: CATEGORIES.BURRITOS,
     imageUrl: "https://images.unsplash.com/photo-1626700051175-6818013e1d4f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
@@ -251,13 +266,13 @@ export const MENU_ITEMS: MenuItem[] = [
     isVegetarian: false,
     isVegan: false,
     isGlutenFree: true,
-    ingredients: ["choice of protein", "rice", "beans", "toppings", "sauces"],
+    ingredients: ["grilled chicken", "rice", "beans", "toppings", "sauces"],
     isAvailable: true,
     modelPath: "/attached_assets/Burrito_Bowl_Chicken(Burritos_Category)_1757010346004.glb"
   },
   {
-    id: "15",
-    name: "Zinger 12\"",
+    id: "16",
+    name: "Zinger Burrito",
     description: "Crispy spicy chicken burrito with special zinger sauce",
     price: "5.49 JD",
     category: CATEGORIES.BURRITOS,
@@ -270,27 +285,12 @@ export const MENU_ITEMS: MenuItem[] = [
     isAvailable: true,
     modelPath: "/attached_assets/Zinger(Burritos_Category)_1757009718810.glb"
   },
-  {
-    id: "16",
-    name: "Turkey Burrito 10\"",
-    description: "Lean turkey burrito with fresh vegetables and light sauce",
-    price: "4.75 JD",
-    category: CATEGORIES.BURRITOS,
-    imageUrl: "https://images.unsplash.com/photo-1626700051175-6818013e1d4f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-    spiceLevel: 1,
-    isVegetarian: false,
-    isVegan: false,
-    isGlutenFree: false,
-    ingredients: ["turkey", "rice", "beans", "lettuce", "tomato", "flour tortilla"],
-    isAvailable: true,
-    modelPath: "/attached_assets/2-fahita burrito_1756916625949.glb"
-  },
 
   // 🍔 BURGERS
   {
     id: "17",
-    name: "Chicken Grilled (2 pcs)",
-    description: "Two grilled chicken burgers with fresh toppings",
+    name: "Chicken Grilled",
+    description: "Grilled chicken burger with fresh toppings",
     price: "3.75 JD",
     category: CATEGORIES.BURGERS,
     imageUrl: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
@@ -304,8 +304,8 @@ export const MENU_ITEMS: MenuItem[] = [
   },
   {
     id: "18",
-    name: "Classic (2 pcs)",
-    description: "Two classic beef burgers with traditional toppings",
+    name: "Classic Burger",
+    description: "Classic beef burger with traditional toppings",
     price: "4.75 JD",
     category: CATEGORIES.BURGERS,
     imageUrl: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
@@ -319,8 +319,8 @@ export const MENU_ITEMS: MenuItem[] = [
   },
   {
     id: "19",
-    name: "Mushroom (2 pcs)",
-    description: "Two burgers topped with sautéed mushrooms",
+    name: "Mushroom Burger",
+    description: "Burger topped with sautéed mushrooms",
     price: "4.75 JD",
     category: CATEGORIES.BURGERS,
     imageUrl: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
@@ -334,8 +334,8 @@ export const MENU_ITEMS: MenuItem[] = [
   },
   {
     id: "20",
-    name: "Mr. Smokey (2 pcs)",
-    description: "Two smoky flavored burgers with special BBQ sauce",
+    name: "Mr. Smokey Burger",
+    description: "Smoky flavored burger with special BBQ sauce",
     price: "4.75 JD",
     category: CATEGORIES.BURGERS,
     imageUrl: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
@@ -362,7 +362,7 @@ export const MENU_ITEMS: MenuItem[] = [
     isGlutenFree: true,
     ingredients: ["rice", "black beans", "chicken", "dynamite sauce", "corn", "lettuce"],
     isAvailable: true,
-    modelPath: "/attached_assets/Dynamite_Bowl(Favorites_Category)_1757009297747.glb"
+    modelPath: "/attached_assets/1-dynamite bowl_1756916613906.glb"
   },
   {
     id: "22",
@@ -377,7 +377,7 @@ export const MENU_ITEMS: MenuItem[] = [
     isGlutenFree: false,
     ingredients: ["grilled beef", "bell peppers", "onions", "tortillas", "guacamole", "sour cream"],
     isAvailable: true,
-    modelPath: "/attached_assets/Fajita_Platter(Favorites_Category)_1757009365917.glb"
+    modelPath: "/attached_assets/3-fahita platter_1756916638887.glb"
   },
   {
     id: "23",
@@ -424,12 +424,12 @@ export const MENU_ITEMS: MenuItem[] = [
     isGlutenFree: true,
     ingredients: ["french fries", "cheese sauce", "jalapeños", "Mexican seasoning"],
     isAvailable: true,
-    modelPath: "/attached_assets/Mexican_Fries(Sides_Category)_1757009528617.glb"
+    modelPath: "/attached_assets/6-mexican fries_1756916717240.glb"
   },
   {
     id: "26",
-    name: "Nachos",
-    description: "Crispy tortilla chips with melted cheese and fresh toppings",
+    name: "Nachos (Beef, Chicken, Vegetarian)",
+    description: "Crispy tortilla chips with melted cheese and choice of topping",
     price: "3.75 JD",
     category: CATEGORIES.SIDES,
     imageUrl: "https://images.unsplash.com/photo-1513456852971-30c0b8199d4d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
@@ -437,9 +437,9 @@ export const MENU_ITEMS: MenuItem[] = [
     isVegetarian: true,
     isVegan: false,
     isGlutenFree: true,
-    ingredients: ["tortilla chips", "cheese", "jalapeños", "sour cream", "guacamole"],
+    ingredients: ["tortilla chips", "cheese", "choice of protein", "jalapeños", "sour cream"],
     isAvailable: true,
-    modelPath: "/attached_assets/Nachos(Sides_Category)_1757009627864.glb"
+    modelPath: "/attached_assets/7-nachos ( beef, chicken , vege)_1756916738360.glb"
   },
   {
     id: "27",
@@ -518,7 +518,7 @@ export const MENU_ITEMS: MenuItem[] = [
     isGlutenFree: true,
     ingredients: ["grilled chicken", "mixed greens", "tomatoes", "cucumbers", "avocado"],
     isAvailable: true,
-    modelPath: "/attached_assets/Healthy_Platter(Healthy_Corner_Category)_1757009513885.glb"
+    modelPath: "/attached_assets/5-healthy platter__1756916699390.glb"
   },
   {
     id: "32",
@@ -567,7 +567,7 @@ export const MENU_ITEMS: MenuItem[] = [
     isGlutenFree: false,
     ingredients: ["taco shells", "seasoned beef", "cheese", "lettuce", "tomatoes", "sour cream"],
     isAvailable: true,
-    modelPath: "/attached_assets/Taco_Kit(Offers_Category)_1757009658196.glb"
+    modelPath: "/attached_assets/18-taco kit_1756916979854.glb"
   },
 
   // 🥤 DRINKS
@@ -768,5 +768,22 @@ export const MENU_ITEMS: MenuItem[] = [
     ingredients: ["black beans", "rice", "vegetables", "cheese", "tortilla"],
     isAvailable: true,
     modelPath: "/attached_assets/Vegetarian_Burrito(Finished)_1756917243499.glb"
+  },
+
+  // Additional items to use remaining models
+  {
+    id: "48",
+    name: "Grilled Chicken Burger Special",
+    description: "Special grilled chicken burger with premium ingredients",
+    price: "4.25 JD",
+    category: CATEGORIES.BURGERS,
+    imageUrl: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+    spiceLevel: 1,
+    isVegetarian: false,
+    isVegan: false,
+    isGlutenFree: false,
+    ingredients: ["grilled chicken", "burger bun", "lettuce", "tomato", "special sauce"],
+    isAvailable: true,
+    modelPath: "/attached_assets/17-grilled chicken burger_1756916864182.glb"
   }
 ];
