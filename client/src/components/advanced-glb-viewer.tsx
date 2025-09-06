@@ -1,310 +1,222 @@
-import React, { useRef, useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from "react";
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-
-// Import model-viewer for native AR support
-declare global {
-  namespace JSX {
-    interface IntrinsicElements {
-      'model-viewer': any;
-    }
-  }
-}
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
+import { getPreloadedModel, isModelPreloading, prioritizeModelLoading } from "@/hooks/use-model-preloader";
 
 interface AdvancedGLBViewerProps {
-  modelPath: string | null;
-  dishName: string;
   isOpen: boolean;
+  onClose: () => void;
+  dishName: string;
+  modelPath?: string;
 }
 
-const AdvancedGLBViewer: React.FC<AdvancedGLBViewerProps> = ({ 
-  modelPath, 
-  dishName, 
-  isOpen 
-}) => {
+export default function AdvancedGLBViewer({ isOpen, onClose, dishName, modelPath }: AdvancedGLBViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
+  const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const animationRef = useRef<number | null>(null);
   const [modelStatus, setModelStatus] = useState<'loading' | 'loaded' | 'error'>('loading');
   const [loadingMessage, setLoadingMessage] = useState('Preparing your 3D experience...');
   const isMobile = typeof window !== 'undefined' ? window.innerWidth < 768 : false;
 
-  // Native AR using model-viewer (like your working project!)
+  // Handle AR View - Direct Camera AR Experience
   const handleViewInSpace = () => {
-    console.log('🔍 Launching native AR for:', dishName);
-    
-    // Create model-viewer element with native AR support
-    const modelViewer = document.createElement('model-viewer');
-    modelViewer.src = window.location.origin + modelPath;
+    if (!modelPath) {
+      alert('3D model not available for AR view');
+      return;
+    }
+
+    // Create model-viewer element for instant AR experience
+    createModelViewerAR();
+  };
+
+  // Model Viewer AR - Direct Camera AR Experience
+  const createModelViewerAR = () => {
+    // Load model-viewer script if not already loaded
+    if (!document.querySelector('script[src*="model-viewer"]')) {
+      const script = document.createElement('script');
+      script.type = 'module';
+      script.src = 'https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js';
+      document.head.appendChild(script);
+    }
+
+    // Create overlay container
+    const overlay = document.createElement('div');
+    overlay.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      z-index: 999999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      box-sizing: border-box;
+    `;
+
+    // Create model-viewer element with AR capabilities
+    const modelViewer = document.createElement('model-viewer') as any;
+    modelViewer.src = modelPath;
     modelViewer.setAttribute('ar', '');
-    modelViewer.setAttribute('ar-modes', 'quick-look scene-viewer webxr');
+    modelViewer.setAttribute('ar-modes', 'webxr scene-viewer quick-look');
     modelViewer.setAttribute('camera-controls', '');
-    modelViewer.style.width = '300px';
-    modelViewer.style.height = '300px';
-    modelViewer.style.position = 'fixed';
-    modelViewer.style.top = '50%';
-    modelViewer.style.left = '50%';
-    modelViewer.style.transform = 'translate(-50%, -50%)';
-    modelViewer.style.zIndex = '999999';
-    modelViewer.style.background = 'rgba(0,0,0,0.9)';
-    modelViewer.style.borderRadius = '15px';
+    modelViewer.setAttribute('auto-rotate', '');
+    modelViewer.setAttribute('shadow-intensity', '1');
+    modelViewer.setAttribute('environment-image', 'neutral');
+    modelViewer.setAttribute('poster', '');
+    modelViewer.setAttribute('loading', 'eager');
     
-    // Create AR button
+    modelViewer.style.cssText = `
+      width: 100%;
+      height: 70vh;
+      max-width: 500px;
+      border-radius: 15px;
+      background: transparent;
+      --poster-color: transparent;
+    `;
+
+    // Create AR button that automatically appears
     const arButton = document.createElement('button');
-    arButton.textContent = 'VIEW IN YOUR SPACE';
-    arButton.setAttribute('slot', 'ar-button');
-    arButton.style.position = 'absolute';
-    arButton.style.bottom = '15px';
-    arButton.style.left = '50%';
-    arButton.style.transform = 'translateX(-50%)';
-    arButton.style.background = '#B22222';
-    arButton.style.color = 'white';
-    arButton.style.border = 'none';
-    arButton.style.padding = '12px 24px';
-    arButton.style.borderRadius = '25px';
-    arButton.style.fontWeight = 'bold';
-    arButton.style.cursor = 'pointer';
-    
+    arButton.innerHTML = `
+      <i class="fas fa-camera" style="margin-right: 8px;"></i>
+      View in Your Space
+    `;
+    arButton.style.cssText = `
+      background: linear-gradient(135deg, #D4AF37 0%, #E8C547 100%);
+      color: #1A3A2F;
+      border: none;
+      padding: 15px 30px;
+      border-radius: 30px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    `;
+
     // Create close button
     const closeButton = document.createElement('button');
-    closeButton.textContent = '✕';
-    closeButton.style.position = 'absolute';
-    closeButton.style.top = '10px';
-    closeButton.style.right = '10px';
-    closeButton.style.background = 'rgba(255,255,255,0.8)';
-    closeButton.style.border = 'none';
-    closeButton.style.borderRadius = '50%';
-    closeButton.style.width = '30px';
-    closeButton.style.height = '30px';
-    closeButton.style.cursor = 'pointer';
-    closeButton.style.zIndex = '1000000';
-    
+    closeButton.innerHTML = '×';
+    closeButton.style.cssText = `
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(255, 255, 255, 0.9);
+      color: #1A3A2F;
+      border: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      font-size: 24px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      transition: all 0.3s ease;
+    `;
+
+    // Create instruction text
+    const instruction = document.createElement('div');
+    instruction.innerHTML = `
+      <h3 style="color: #D4AF37; margin-bottom: 10px; font-size: 18px;">AR View Ready</h3>
+      <p style="color: white; text-align: center; line-height: 1.4;">
+        Tap "View in Your Space" to place this ${dishName} in your real environment using your camera.
+      </p>
+    `;
+    instruction.style.cssText = `
+      text-align: center;
+      margin-bottom: 20px;
+      max-width: 400px;
+    `;
+
+    // Event handlers
+    arButton.onclick = () => {
+      // Trigger AR experience
+      if (modelViewer.canActivateAR) {
+        modelViewer.activateAR();
+      } else {
+        // Fallback for devices without native AR support
+        if (/Android/i.test(navigator.userAgent)) {
+          const sceneViewerUrl = `https://arvr.google.com/scene-viewer/1.0?file=${encodeURIComponent(window.location.origin + modelPath!)}&mode=ar_only&title=${encodeURIComponent(dishName)}`;
+          window.open(sceneViewerUrl, '_blank');
+        } else if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+          // iOS AR Quick Look
+          const link = document.createElement('a');
+          link.href = modelPath!;
+          link.rel = 'ar';
+          link.appendChild(document.createElement('img'));
+          link.style.display = 'none';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        } else {
+          alert('AR not supported on this device. Please try on a mobile device with AR capabilities.');
+        }
+      }
+    };
+
     closeButton.onclick = () => {
-      document.body.removeChild(modelViewer);
+      document.body.removeChild(overlay);
     };
-    
-    modelViewer.appendChild(arButton);
-    modelViewer.appendChild(closeButton);
-    document.body.appendChild(modelViewer);
-    
-    console.log('✅ Native AR model-viewer launched!');
-  };
 
-  // YOUR WORKING METHOD - Client-side GLB to USDZ conversion
-  const convertAndLaunchIOSAR = async () => {
-    try {
-      console.log('🔄 Converting GLB to USDZ using YOUR working method...');
-      
-      // Fetch GLB file
-      const response = await fetch(window.location.origin + modelPath);
-      const glbArrayBuffer = await response.arrayBuffer();
-      
-      console.log('✅ GLB file loaded, converting to USDZ...');
-      
-      // Use the same method from your working project
-      try {
-        // Convert GLB to USDZ (your working approach)
-        const usdzBuffer = await convertGLBToUSDZ(glbArrayBuffer);
-        const usdzBlob = new Blob([usdzBuffer], { type: 'model/vnd.usdz+zip' });
-        const usdzUrl = URL.createObjectURL(usdzBlob);
-        
-        console.log('✅ GLB converted to USDZ successfully!');
-        
-        // Launch iOS AR Quick Look (your exact method)
-        const arLink = document.createElement('a');
-        arLink.href = usdzUrl;
-        arLink.rel = 'ar';
-        arLink.download = `${dishName}.usdz`;
-        
-        // Add image element (required for iOS)
-        const img = document.createElement('img');
-        img.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
-        img.alt = dishName;
-        arLink.appendChild(img);
-        
-        document.body.appendChild(arLink);
-        arLink.click();
-        
-        console.log('🚀 REAL iOS AR Quick Look launched with converted USDZ!');
-        
-        // Clean up
-        setTimeout(() => {
-          document.body.removeChild(arLink);
-          URL.revokeObjectURL(usdzUrl);
-        }, 1000);
-        
-      } catch (conversionError) {
-        console.error('❌ Client-side conversion failed:', conversionError);
-        throw conversionError;
+    // Handle escape key
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        document.body.removeChild(overlay);
+        document.removeEventListener('keydown', handleEscape);
       }
-      
-    } catch (error) {
-      console.error('❌ GLB to USDZ conversion failed:', error);
-      
-      // Fallback: Direct GLB attempt (some newer iOS versions support GLB)
-      console.log('🔄 Trying direct GLB approach...');
-      
-      const directArLink = document.createElement('a');
-      directArLink.href = window.location.origin + modelPath;
-      directArLink.rel = 'ar';
-      
-      const img = document.createElement('img');
-      img.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
-      img.alt = dishName;
-      directArLink.appendChild(img);
-      
-      document.body.appendChild(directArLink);
-      directArLink.click();
-      document.body.removeChild(directArLink);
-      
-      console.log('🚀 Direct GLB AR Quick Look attempted');
-    }
-  };
-
-  // GLB to USDZ conversion function (from your working project)
-  async function convertGLBToUSDZ(glbBuffer: ArrayBuffer): Promise<ArrayBuffer> {
-    // Simple GLB to USDZ conversion using basic USDZ structure
-    const usdzData = new Uint8Array(glbBuffer.byteLength + 1024); // Add some padding
-    
-    // USDZ header (simplified - this is the basic structure that works)
-    const header = new TextEncoder().encode('PK\x03\x04'); // ZIP header
-    usdzData.set(header, 0);
-    
-    // Add GLB data as main model
-    const glbArray = new Uint8Array(glbBuffer);
-    usdzData.set(glbArray, 30); // Offset for ZIP structure
-    
-    // Return the USDZ buffer
-    return usdzData.buffer.slice(0, glbBuffer.byteLength + 30);
-  }
-
-  // Launch AR Code Style Experience - Full Screen AR Camera
-  const launchARCodeExperience = (stream: MediaStream) => {
-    console.log('🚀 Launching AR Code style experience!');
-    
-    // Create full-screen AR overlay (like AR Code app)
-    const arOverlay = document.createElement('div');
-    arOverlay.style.cssText = `
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: black; z-index: 999999; display: flex; flex-direction: column;
-    `;
-    
-    // Camera video background
-    const video = document.createElement('video');
-    video.srcObject = stream;
-    video.style.cssText = `
-      width: 100%; height: 100%; object-fit: cover;
-    `;
-    video.autoplay = true;
-    video.playsInline = true;
-    
-    // 3D canvas overlay for AR model
-    const canvas = document.createElement('canvas');
-    canvas.style.cssText = `
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    `;
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    
-    // Three.js AR scene
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 20);
-    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setClearColor(0x000000, 0); // Transparent
-    
-    // AR lighting
-    scene.add(new THREE.AmbientLight(0xffffff, 0.6));
-    const light = new THREE.DirectionalLight(0xffffff, 0.8);
-    light.position.set(5, 10, 5);
-    scene.add(light);
-    
-    // Load 3D model for AR
-    const loader = new GLTFLoader();
-    let arModel: THREE.Group | null = null;
-    
-    loader.load(modelPath!, (gltf) => {
-      console.log('✅ 3D model loaded for AR Code experience');
-      
-      const model = gltf.scene;
-      const box = new THREE.Box3().setFromObject(model);
-      const size = box.getSize(new THREE.Vector3());
-      const scale = 0.4 / Math.max(size.x, size.y, size.z); // Perfect AR size
-      model.scale.setScalar(scale);
-      model.position.set(0, -0.3, -1.2); // Position in front of camera
-      
-      arModel = new THREE.Group();
-      arModel.add(model);
-      scene.add(arModel);
-      
-      console.log('🍔 3D model placed in AR space!');
-    });
-    
-    // AR Code style close button
-    const closeBtn = document.createElement('button');
-    closeBtn.innerHTML = '✕';
-    closeBtn.style.cssText = `
-      position: absolute; top: 30px; right: 30px; z-index: 1000000;
-      width: 50px; height: 50px; border-radius: 25px;
-      background: rgba(0,0,0,0.7); color: white; border: 2px solid white;
-      font-size: 20px; font-weight: bold; cursor: pointer;
-    `;
-    closeBtn.onclick = () => {
-      stream.getTracks().forEach(track => track.stop());
-      document.body.removeChild(arOverlay);
-      console.log('🔚 AR Code experience ended');
     };
-    
-    // AR Code style instructions
-    const instructions = document.createElement('div');
-    instructions.innerHTML = `
-      <div style="
-        color: white; text-align: center; padding: 15px 20px;
-        background: rgba(0,0,0,0.8); border-radius: 20px;
-        border: 2px solid rgba(255,255,255,0.3);
-      ">
-        <h3 style="margin: 0 0 8px; font-size: 18px; font-weight: bold;">🍔 ${dishName}</h3>
-        <p style="margin: 0; font-size: 14px; opacity: 0.9;">Move your phone to explore in AR</p>
-      </div>
-    `;
-    instructions.style.cssText = `
-      position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
-      z-index: 1000000; max-width: 320px;
-    `;
-    
-    // Assemble AR experience
-    arOverlay.appendChild(video);
-    arOverlay.appendChild(canvas);
-    arOverlay.appendChild(closeBtn);
-    arOverlay.appendChild(instructions);
-    document.body.appendChild(arOverlay);
-    
-    // AR animation loop
-    const animate = () => {
-      requestAnimationFrame(animate);
-      
-      // Gentle rotation for realism
-      if (arModel) {
-        arModel.rotation.y += 0.008;
+    document.addEventListener('keydown', handleEscape);
+
+    // Handle click outside
+    overlay.onclick = (e) => {
+      if (e.target === overlay) {
+        document.body.removeChild(overlay);
+        document.removeEventListener('keydown', handleEscape);
       }
-      
-      renderer.render(scene, camera);
     };
-    animate();
-    
-    console.log('🎬 AR Code experience launched successfully!');
+
+    // Assemble elements
+    overlay.appendChild(closeButton);
+    overlay.appendChild(instruction);
+    overlay.appendChild(modelViewer);
+    overlay.appendChild(arButton);
+
+    // Add to DOM
+    document.body.appendChild(overlay);
+
+    // Auto-trigger AR if supported (after model loads)
+    setTimeout(() => {
+      if (modelViewer.canActivateAR && /Mobi|Android/i.test(navigator.userAgent)) {
+        // On mobile, automatically highlight the AR button
+        arButton.style.animation = 'pulse 2s infinite';
+        arButton.style.transform = 'scale(1.05)';
+      }
+    }, 2000);
   };
 
   useEffect(() => {
-    if (!isOpen || !containerRef.current || !modelPath) return;
+    if (!isOpen || !containerRef.current) return;
 
-    console.log('🚀 Initializing 3D viewer for:', dishName);
     setModelStatus('loading');
-    setLoadingMessage('Preparing your 3D experience...');
+    setLoadingMessage('Loading your delicious 3D model...');
 
-    // Scene setup
+    // Scene setup - Force solid background
     const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xffffff);
     sceneRef.current = scene;
 
     // Camera setup
@@ -316,120 +228,325 @@ const AdvancedGLBViewer: React.FC<AdvancedGLBViewerProps> = ({
     );
     camera.position.set(3, 2, 3);
 
-    // Renderer setup
+    // Renderer setup - Optimized for faster rendering
     const renderer = new THREE.WebGLRenderer({ 
-      antialias: !isMobile,
-      alpha: true,
-      powerPreference: 'high-performance'
+      antialias: !isMobile, // Disable anti-aliasing on mobile for performance
+      alpha: false,
+      premultipliedAlpha: false,
+      preserveDrawingBuffer: false,
+      powerPreference: "high-performance", // Use dedicated GPU if available
+      stencil: false,
+      depth: true
     });
     renderer.setSize(containerRef.current.clientWidth, containerRef.current.clientHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.setClearColor(0x000000, 0);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Cap pixel ratio for performance
+    renderer.shadowMap.enabled = false;
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.NoToneMapping;
+    renderer.toneMappingExposure = 1.0;
+    renderer.setClearColor(0xffffff, 1.0);
+    renderer.sortObjects = false;
     
-    if (!isMobile) {
-      renderer.shadowMap.enabled = true;
-      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    }
+    // Performance optimizations
+    renderer.info.autoReset = false;
+    renderer.getContext().disable(renderer.getContext().DITHER);
     
     containerRef.current.appendChild(renderer.domElement);
     rendererRef.current = renderer;
 
-    // Enhanced lighting
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    // Optimized lighting setup - Fewer lights for better performance
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
     scene.add(ambientLight);
-
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-    directionalLight.position.set(5, 10, 5);
-    if (!isMobile) {
-      directionalLight.castShadow = true;
-      directionalLight.shadow.mapSize.width = 1024;
-      directionalLight.shadow.mapSize.height = 1024;
-    }
-    scene.add(directionalLight);
-
-    const fillLight1 = new THREE.DirectionalLight(0xffffff, 0.3);
-    fillLight1.position.set(-5, 5, -5);
-    scene.add(fillLight1);
-
-    const fillLight2 = new THREE.DirectionalLight(0xffffff, 0.2);
-    fillLight2.position.set(0, -5, 5);
-    scene.add(fillLight2);
-
-    // Load GLB model
-    const loader = new GLTFLoader();
-    console.log(`📦 Loading model: ${modelPath}`);
     
-    let loadingDots = '';
-    const loadingInterval = setInterval(() => {
-      loadingDots = loadingDots.length >= 3 ? '' : loadingDots + '.';
-      setLoadingMessage(`Loading your 3D ${dishName}${loadingDots}`);
-    }, 500);
+    const mainLight = new THREE.DirectionalLight(0xffffff, 1.5);
+    mainLight.position.set(5, 5, 5);
+    mainLight.castShadow = false; // Disable shadows for performance
+    scene.add(mainLight);
 
-    loader.load(
-      modelPath,
-      (gltf) => {
-        clearInterval(loadingInterval);
-        console.log('✅ Model loaded successfully');
+    // Reduced number of lights for better performance
+    const fillLight = new THREE.DirectionalLight(0xffffff, 0.4);
+    fillLight.position.set(-3, 3, -3);
+    scene.add(fillLight);
+
+    // Load GLB model with optimizations
+    const loader = new GLTFLoader();
+    
+    // Add DRACO compression support for faster loading (optional)
+    try {
+      const dracoLoader = new DRACOLoader();
+      dracoLoader.setDecoderPath('/draco/');
+      loader.setDRACOLoader(dracoLoader);
+    } catch (error) {
+      // DRACO loader is optional - continue without it
+      console.log('DRACO loader not available, using standard loading');
+    }
+    
+    // Use caching manager for faster subsequent loads
+    THREE.Cache.enabled = true;
+    
+    if (modelPath) {
+      // Check if model is already preloaded
+      const preloadedModel = getPreloadedModel(modelPath);
+      
+      if (preloadedModel) {
+        // Use preloaded model instantly!
+        console.log('🚀 Using preloaded model instantly!');
+        usePreloadedModel(preloadedModel);
         
-        const model = gltf.scene;
+      } else {
+        // Prioritize loading this model since user clicked on it
+        setLoadingMessage('Prioritizing your 3D model...');
+        console.log('⚡ Prioritizing model loading for user request');
         
-        // Center and scale the model
-        const box = new THREE.Box3().setFromObject(model);
-        const center = box.getCenter(new THREE.Vector3());
-        const size = box.getSize(new THREE.Vector3());
+        prioritizeModelLoading(modelPath)
+          .then((modelGroup) => {
+            console.log('🚀 Priority model loaded!');
+            usePreloadedModel(modelGroup);
+          })
+          .catch((error) => {
+            console.error('❌ Priority loading failed:', error);
+            setModelStatus('error');
+          });
+      }
+    }
+
+    function usePreloadedModel(modelGroup: THREE.Group) {
+      setModelStatus('loaded');
+      
+      // Clone the preloaded model to avoid modifying the cached version
+      const clonedModel = modelGroup.clone();
+      
+      // Create a group to center the model (same as regular loading)
+      const group = new THREE.Group();
+      group.add(clonedModel);
+
+      // Calculate bounding box and center the model
+      const box = new THREE.Box3().setFromObject(clonedModel);
+      const size = box.getSize(new THREE.Vector3());
+      const center = box.getCenter(new THREE.Vector3());
+
+      console.log('📏 Model size:', size);
+      console.log('📍 Original center:', center);
+
+      // Center the model using subtract method (same as original)
+      clonedModel.position.sub(center);
+
+      // Scale the model to fit nicely in the scene
+      const maxDimension = Math.max(size.x, size.y, size.z);
+      const targetSize = 3;
+      const scale = targetSize / maxDimension;
+      group.scale.setScalar(scale);
+
+      console.log('🔧 Group scale:', scale);
+
+      scene.add(group);
+
+      // Force solid materials - No transparency allowed! (same as original)
+      clonedModel.traverse((child) => {
+        if (child instanceof THREE.Mesh) {
+          child.castShadow = false;
+          child.receiveShadow = false;
+          child.frustumCulled = false;
+          
+          // FORCE SOLID MATERIALS
+          if (child.material) {
+            if (Array.isArray(child.material)) {
+              child.material.forEach(mat => {
+                mat.transparent = false;
+                mat.alphaTest = 0;
+                mat.opacity = 1.0;
+                mat.depthWrite = true;
+                mat.depthTest = true;
+                mat.side = THREE.FrontSide;
+                mat.blending = THREE.NormalBlending;
+                if (mat.map) mat.map.flipY = false;
+                mat.needsUpdate = true;
+              });
+            } else {
+              child.material.transparent = false;
+              child.material.alphaTest = 0;
+              child.material.opacity = 1.0;
+              child.material.depthWrite = true;
+              child.material.depthTest = true;
+              child.material.side = THREE.FrontSide;
+              child.material.blending = THREE.NormalBlending;
+              if (child.material.map) child.material.map.flipY = false;
+              child.material.needsUpdate = true;
+            }
+          }
+          
+          // Force render order
+          child.renderOrder = 0;
+        }
+      });
+      
+      // Force the model to be visible
+      clonedModel.visible = true;
+      clonedModel.matrixAutoUpdate = true;
+
+      // Start optimized animation loop
+      let lastTime = 0;
+      const targetFPS = isMobile ? 30 : 60;
+      const frameInterval = 1000 / targetFPS;
+      
+      const animate = (currentTime: number) => {
+        animationRef.current = requestAnimationFrame(animate);
         
-        const maxDim = Math.max(size.x, size.y, size.z);
-        const scale = 2.5 / maxDim;
-        model.scale.setScalar(scale);
-        
-        model.position.sub(center.multiplyScalar(scale));
-        
-        if (!isMobile) {
-          model.traverse((child) => {
+        if (currentTime - lastTime >= frameInterval) {
+          renderer.render(scene, camera);
+          lastTime = currentTime;
+        }
+      };
+      animate(0);
+    }
+
+    function regularLoadModel() {
+      if (!modelPath) return;
+      
+      loader.load(
+        modelPath,
+        (gltf) => {
+          console.log('🎉 Model successfully loaded and rendered!');
+          setModelStatus('loaded');
+          
+          // Optimize model materials for faster rendering
+          gltf.scene.traverse((child) => {
             if (child instanceof THREE.Mesh) {
-              child.castShadow = true;
-              child.receiveShadow = true;
+              // Force opacity for transparency issues
+              if (child.material) {
+                if (Array.isArray(child.material)) {
+                  child.material.forEach(mat => {
+                    mat.transparent = false;
+                    mat.alphaTest = 0;
+                    mat.opacity = 1.0;
+                  });
+                } else {
+                  child.material.transparent = false;
+                  child.material.alphaTest = 0;
+                  child.material.opacity = 1.0;
+                }
+              }
             }
           });
-        }
-        
-        scene.add(model);
-        setModelStatus('loaded');
-        console.log('🎨 Model added to scene');
-      },
-      (progress) => {
-        if (progress.lengthComputable) {
-          const percent = Math.round((progress.loaded / progress.total) * 100);
-          if (percent < 30) {
-            setLoadingMessage(`Loading ${percent}%... Getting your ${dishName} ready!`);
-          } else if (percent < 70) {
-            setLoadingMessage(`Loading ${percent}%... Looking good!`);
-          } else {
-            setLoadingMessage(`Loading ${percent}%... Almost there!`);
-          }
-          console.log(`📊 Loading progress: ${percent}%`);
-        } else {
-          setLoadingMessage('Downloading 3D model...');
-        }
-      },
-      (error) => {
-        clearInterval(loadingInterval);
-        console.error('❌ Error loading GLB model:', error);
-        setModelStatus('error');
-      }
-    );
 
-    // Mouse/Touch controls
+          // Create a group to center the model
+          const group = new THREE.Group();
+          group.add(gltf.scene);
+
+          // Calculate bounding box and center the model
+          const box = new THREE.Box3().setFromObject(gltf.scene);
+          const size = box.getSize(new THREE.Vector3());
+          const center = box.getCenter(new THREE.Vector3());
+
+          console.log('📏 Model size:', size);
+          console.log('📍 Original center:', center);
+
+          // Center the model
+          gltf.scene.position.sub(center);
+
+          // Scale the model to fit nicely in the scene
+          const maxDimension = Math.max(size.x, size.y, size.z);
+          const targetSize = 3; // Desired size in the scene
+          const scale = targetSize / maxDimension;
+          group.scale.setScalar(scale);
+
+          console.log('🔧 Group scale:', scale);
+
+          scene.add(group);
+
+          // Force solid materials - No transparency allowed!
+          gltf.scene.traverse((child) => {
+            if (child instanceof THREE.Mesh) {
+              child.castShadow = false;
+              child.receiveShadow = false;
+              child.frustumCulled = false;
+              
+              // FORCE SOLID MATERIALS
+              if (child.material) {
+                if (Array.isArray(child.material)) {
+                  child.material.forEach(mat => {
+                    mat.transparent = false;
+                    mat.alphaTest = 0;
+                    mat.opacity = 1.0;
+                    mat.depthWrite = true;
+                    mat.depthTest = true;
+                    mat.side = THREE.FrontSide;
+                    mat.blending = THREE.NormalBlending;
+                    if (mat.map) mat.map.flipY = false;
+                    mat.needsUpdate = true;
+                  });
+                } else {
+                  child.material.transparent = false;
+                  child.material.alphaTest = 0;
+                  child.material.opacity = 1.0;
+                  child.material.depthWrite = true;
+                  child.material.depthTest = true;
+                  child.material.side = THREE.FrontSide;
+                  child.material.blending = THREE.NormalBlending;
+                  if (child.material.map) child.material.map.flipY = false;
+                  child.material.needsUpdate = true;
+                }
+              }
+              
+              // Force render order
+              child.renderOrder = 0;
+            }
+          });
+          
+          // Force the model to be visible
+          gltf.scene.visible = true;
+          gltf.scene.matrixAutoUpdate = true;
+
+          // Start optimized animation loop with lower FPS on mobile
+          let lastTime = 0;
+          const targetFPS = isMobile ? 30 : 60; // Lower FPS on mobile for better performance
+          const frameInterval = 1000 / targetFPS;
+          
+          const animate = (currentTime: number) => {
+            animationRef.current = requestAnimationFrame(animate);
+            
+            if (currentTime - lastTime >= frameInterval) {
+              renderer.render(scene, camera);
+              lastTime = currentTime;
+            }
+          };
+          animate(0);
+        },
+        (progress) => {
+          if (progress.total > 0) {
+            const percent = Math.round((progress.loaded / progress.total) * 100);
+            if (percent < 30) {
+              setLoadingMessage('Starting to load your 3D model...');
+            } else if (percent < 70) {
+              setLoadingMessage(`Loading ${percent}%... Looking good!`);
+            } else {
+              setLoadingMessage(`Loading ${percent}%... Almost there!`);
+            }
+            console.log(`📊 Loading progress: ${percent}%`);
+          } else {
+            setLoadingMessage('Downloading 3D model...');
+          }
+        },
+        (error) => {
+          console.error('❌ Error loading GLB model:', error);
+          setModelStatus('error');
+        }
+      );
+    }
+
+    // Mouse/Touch controls for orbiting
     let isDragging = false;
     let previousMousePosition = { x: 0, y: 0 };
     let cameraDistance = Math.sqrt(camera.position.x ** 2 + camera.position.y ** 2 + camera.position.z ** 2);
     
+    // Smooth camera interpolation
     let targetTheta = Math.atan2(camera.position.x, camera.position.z);
     let targetPhi = Math.acos(camera.position.y / cameraDistance);
     let currentTheta = targetTheta;
     let currentPhi = targetPhi;
 
     const updateCamera = () => {
+      // Smooth interpolation
       currentTheta += (targetTheta - currentTheta) * 0.1;
       currentPhi += (targetPhi - currentPhi) * 0.1;
       
@@ -439,22 +556,15 @@ const AdvancedGLBViewer: React.FC<AdvancedGLBViewerProps> = ({
       camera.lookAt(0, 0, 0);
     };
 
-    let lastTime = 0;
-    const frameInterval = 1000 / 30;
-    
-    const animate = (currentTime: number) => {
+    const animate = () => {
       animationRef.current = requestAnimationFrame(animate);
-      
-      if (currentTime - lastTime >= frameInterval) {
-        updateCamera();
-        if (rendererRef.current && sceneRef.current) {
-          rendererRef.current.render(sceneRef.current, camera);
-        }
-        lastTime = currentTime;
+      updateCamera();
+      if (rendererRef.current && sceneRef.current) {
+        rendererRef.current.render(sceneRef.current, camera);
       }
     };
 
-    // Event handlers
+    // Mouse events
     const onMouseDown = (event: MouseEvent) => {
       isDragging = true;
       previousMousePosition = { x: event.clientX, y: event.clientY };
@@ -481,43 +591,38 @@ const AdvancedGLBViewer: React.FC<AdvancedGLBViewerProps> = ({
       cameraDistance = Math.max(2, Math.min(10, cameraDistance + event.deltaY * 0.01));
     };
 
+    // Touch events
     let lastTouchDistance = 0;
     
     const onTouchStart = (event: TouchEvent) => {
+      event.preventDefault();
       if (event.touches.length === 1) {
-        const touch = event.touches[0];
-        previousMousePosition = { x: touch.clientX, y: touch.clientY };
         isDragging = true;
+        previousMousePosition = { x: event.touches[0].clientX, y: event.touches[0].clientY };
       } else if (event.touches.length === 2) {
         const touch1 = event.touches[0];
         const touch2 = event.touches[1];
-        const distance = Math.sqrt(
-          Math.pow(touch2.clientX - touch1.clientX, 2) + 
-          Math.pow(touch2.clientY - touch1.clientY, 2)
+        lastTouchDistance = Math.sqrt(
+          Math.pow(touch2.clientX - touch1.clientX, 2) + Math.pow(touch2.clientY - touch1.clientY, 2)
         );
-        lastTouchDistance = distance;
-        isDragging = false;
       }
     };
 
     const onTouchMove = (event: TouchEvent) => {
       event.preventDefault();
-      
       if (event.touches.length === 1 && isDragging) {
-        const touch = event.touches[0];
-        const deltaX = touch.clientX - previousMousePosition.x;
-        const deltaY = touch.clientY - previousMousePosition.y;
+        const deltaX = event.touches[0].clientX - previousMousePosition.x;
+        const deltaY = event.touches[0].clientY - previousMousePosition.y;
         
         targetTheta -= deltaX * 0.01;
         targetPhi = Math.max(0.1, Math.min(Math.PI - 0.1, targetPhi + deltaY * 0.01));
         
-        previousMousePosition = { x: touch.clientX, y: touch.clientY };
+        previousMousePosition = { x: event.touches[0].clientX, y: event.touches[0].clientY };
       } else if (event.touches.length === 2) {
         const touch1 = event.touches[0];
         const touch2 = event.touches[1];
         const touchDistance = Math.sqrt(
-          Math.pow(touch2.clientX - touch1.clientX, 2) + 
-          Math.pow(touch2.clientY - touch1.clientY, 2)
+          Math.pow(touch2.clientX - touch1.clientX, 2) + Math.pow(touch2.clientY - touch1.clientY, 2)
         );
         
         if (lastTouchDistance > 0) {
@@ -529,11 +634,6 @@ const AdvancedGLBViewer: React.FC<AdvancedGLBViewerProps> = ({
       }
     };
 
-    const onTouchEnd = () => {
-      isDragging = false;
-      lastTouchDistance = 0;
-    };
-
     const handleResize = () => {
       if (containerRef.current && renderer) {
         camera.aspect = containerRef.current.clientWidth / containerRef.current.clientHeight;
@@ -542,44 +642,39 @@ const AdvancedGLBViewer: React.FC<AdvancedGLBViewerProps> = ({
       }
     };
 
-    // Add event listeners
-    const canvas = renderer.domElement;
-    canvas.addEventListener('mousedown', onMouseDown);
-    canvas.addEventListener('mousemove', onMouseMove);
-    canvas.addEventListener('mouseup', onMouseUp);
-    canvas.addEventListener('wheel', onWheel);
-    canvas.addEventListener('touchstart', onTouchStart);
-    canvas.addEventListener('touchmove', onTouchMove);
-    canvas.addEventListener('touchend', onTouchEnd);
+    // Event listeners
     window.addEventListener('resize', handleResize);
+    renderer.domElement.addEventListener('mousedown', onMouseDown);
+    renderer.domElement.addEventListener('wheel', onWheel, { passive: false });
+    renderer.domElement.addEventListener('touchstart', onTouchStart, { passive: false });
+    renderer.domElement.addEventListener('touchmove', onTouchMove, { passive: false });
+    window.addEventListener('mouseup', onMouseUp);
+    window.addEventListener('mousemove', onMouseMove);
 
-    animationRef.current = requestAnimationFrame(animate);
+    // Start animation
+    animate();
 
+    // Cleanup
     return () => {
+      window.removeEventListener('resize', handleResize);
+      renderer.domElement.removeEventListener('mousedown', onMouseDown);
+      renderer.domElement.removeEventListener('wheel', onWheel);
+      renderer.domElement.removeEventListener('touchstart', onTouchStart);
+      renderer.domElement.removeEventListener('touchmove', onTouchMove);
+      window.removeEventListener('mouseup', onMouseUp);
+      window.removeEventListener('mousemove', onMouseMove);
+      
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
       }
       
-      canvas.removeEventListener('mousedown', onMouseDown);
-      canvas.removeEventListener('mousemove', onMouseMove);
-      canvas.removeEventListener('mouseup', onMouseUp);
-      canvas.removeEventListener('wheel', onWheel);
-      canvas.removeEventListener('touchstart', onTouchStart);
-      canvas.removeEventListener('touchmove', onTouchMove);
-      canvas.removeEventListener('touchend', onTouchEnd);
-      window.removeEventListener('resize', handleResize);
+      if (containerRef.current && renderer.domElement) {
+        containerRef.current.removeChild(renderer.domElement);
+      }
       
-      if (rendererRef.current && containerRef.current) {
-        containerRef.current.removeChild(rendererRef.current.domElement);
-        rendererRef.current.dispose();
-        rendererRef.current = null;
-      }
-      if (sceneRef.current) {
-        sceneRef.current.clear();
-        sceneRef.current = null;
-      }
+      renderer.dispose();
     };
-  }, [isOpen, modelPath, dishName, isMobile]);
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -589,182 +684,242 @@ const AdvancedGLBViewer: React.FC<AdvancedGLBViewerProps> = ({
         position: 'fixed',
         top: 0,
         left: 0,
-        width: '100%',
-        height: '100%',
-        backgroundColor: 'rgba(0, 0, 0, 0.95)',
-        zIndex: 9999,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.7)',
+        zIndex: 999999,
         display: 'flex',
-        flexDirection: 'column'
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: isMobile ? '20px' : '20px'
       }}
+      onClick={onClose}
     >
-      {/* Header */}
-      <div
+      {/* Modern Mobile Modal */}
+      <div 
         style={{
-          padding: '15px 20px',
-          backgroundColor: 'rgba(0, 0, 0, 0.8)',
-          color: 'white',
+          backgroundColor: 'white',
+          borderRadius: isMobile ? '20px' : '16px',
+          width: isMobile ? '95%' : '80%',
+          height: isMobile ? '65vh' : '75vh',
+          maxWidth: isMobile ? '380px' : '800px',
           display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
+          flexDirection: 'column',
+          overflow: 'hidden',
+          position: 'relative',
+          boxShadow: isMobile ? '0 20px 60px rgba(0,0,0,0.25)' : '0 8px 32px rgba(0,0,0,0.2)',
+          border: isMobile ? '1px solid rgba(0,0,0,0.08)' : 'none'
         }}
+        onClick={(e) => e.stopPropagation()}
       >
-        <h2 style={{ margin: 0, fontSize: '18px', fontWeight: 'bold' }}>{dishName}</h2>
-        <button
-          onClick={() => window.history.back()}
-          style={{
-            background: 'rgba(255, 255, 255, 0.1)',
-            border: '1px solid rgba(255, 255, 255, 0.2)',
-            color: 'white',
-            padding: '8px 16px',
-            borderRadius: '20px',
-            cursor: 'pointer',
-            fontSize: '14px'
-          }}
-        >
-          ✕ Close
-        </button>
-      </div>
+        {/* Modern Header */}
+        <div style={{
+          background: modelStatus === 'loaded' ? 'linear-gradient(135deg, #f0f9f0, #e8f5e8)' : 'linear-gradient(135deg, #fefdf0, #fdf8e8)',
+          padding: isMobile ? '6px 12px' : '8px 16px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          borderBottom: isMobile ? 'none' : '1px solid rgba(0,0,0,0.05)',
+          minHeight: isMobile ? '40px' : '48px'
+        }}>
+          <h2 style={{
+            color: '#1a1a1a',
+            margin: 0,
+            fontSize: isMobile ? '13px' : '16px',
+            fontWeight: '600',
+            flex: 1,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            letterSpacing: '-0.01em'
+          }}>
+            {dishName}
+            {modelStatus === 'loaded' && (
+              <span style={{
+                marginLeft: '8px',
+                display: 'inline-block',
+                width: '6px',
+                height: '6px',
+                borderRadius: '50%',
+                backgroundColor: '#22c55e'
+              }} />
+            )}
+          </h2>
+          
+          <button
+            onClick={onClose}
+            style={{
+              background: 'rgba(0,0,0,0.05)',
+              color: '#666',
+              border: 'none',
+              borderRadius: '50%',
+              width: isMobile ? '28px' : '32px',
+              height: isMobile ? '28px' : '32px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              fontSize: isMobile ? '14px' : '16px',
+              transition: 'all 0.2s ease'
+            }}
+            onMouseEnter={(e) => {
+              const target = e.target as HTMLButtonElement;
+              target.style.background = 'rgba(0,0,0,0.1)';
+            }}
+            onMouseLeave={(e) => {
+              const target = e.target as HTMLButtonElement;
+              target.style.background = 'rgba(0,0,0,0.05)';
+            }}
+          >
+            ×
+          </button>
+        </div>
 
-      {/* Main 3D Viewer */}
-      <div style={{ flex: 1, position: 'relative' }}>
+        {/* Main 3D Container */}
         <div
           ref={containerRef}
           style={{
-            width: '100%',
-            height: '100%',
+            flex: 1,
+            position: 'relative',
+            backgroundColor: '#ffffff',
+            cursor: modelStatus === 'loaded' ? 'grab' : 'default'
+          }}
+        >
+        {modelStatus === 'loading' && (
+          <div style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center'
-          }}
-        />
-
-        {/* Loading State */}
-        {modelStatus === 'loading' && (
-          <div
-            style={{
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              color: 'white',
+            justifyContent: 'center',
+            backgroundColor: 'rgba(255,255,255,0.95)',
+            zIndex: 50,
+            flexDirection: 'column',
+            color: '#333'
+          }}>
+            <div style={{ 
+              fontSize: isMobile ? '32px' : '48px', 
+              marginBottom: isMobile ? '15px' : '20px', 
+              animation: 'pulse 1.5s infinite' 
+            }}>🍽️</div>
+            <div style={{ 
+              fontWeight: 'bold', 
+              color: '#fff',
               textAlign: 'center',
-              zIndex: 10
-            }}
-          >
-            <div
-              style={{
-                width: '50px',
-                height: '50px',
-                border: '3px solid rgba(255, 255, 255, 0.3)',
-                borderTop: '3px solid #ff6b6b',
-                borderRadius: '50%',
-                animation: 'spin 1s linear infinite',
-                margin: '0 auto 15px'
-              }}
-            />
-            <p style={{ margin: 0, fontSize: '16px', fontWeight: 'bold' }}>{loadingMessage}</p>
-            <p style={{ margin: '5px 0 0', fontSize: '14px', opacity: 0.8 }}>
-              Preparing your 3D experience...
-            </p>
+              fontSize: isMobile ? '14px' : '16px'
+            }}>{loadingMessage}</div>
+            <div style={{ 
+              fontSize: isMobile ? '11px' : '13px', 
+              marginTop: '8px', 
+              color: '#ccc',
+              textAlign: 'center',
+              maxWidth: isMobile ? '250px' : '300px'
+            }}>
+              Get ready for an amazing 3D food experience! ✨
+            </div>
           </div>
         )}
 
-        {/* Error State */}
         {modelStatus === 'error' && (
-          <div
-            style={{
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              color: 'white',
-              textAlign: 'center',
-              zIndex: 10
-            }}
-          >
-            <div style={{ fontSize: '48px', marginBottom: '15px' }}>😕</div>
-            <p style={{ margin: 0, fontSize: '18px', fontWeight: 'bold' }}>
-              Oops! Something went wrong
-            </p>
-            <p style={{ margin: '10px 0', fontSize: '14px', opacity: 0.8 }}>
-              We couldn't load the 3D model for {dishName}.
-            </p>
-            <button
-              onClick={() => window.location.reload()}
-              style={{
-                background: '#ff6b6b',
-                color: 'white',
-                border: 'none',
-                padding: '10px 20px',
-                borderRadius: '20px',
-                cursor: 'pointer',
-                fontSize: '14px',
-                marginTop: '10px'
-              }}
-            >
-              Try Again
-            </button>
+          <div style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: 'rgba(255,255,255,0.95)',
+            fontSize: isMobile ? '14px' : '16px',
+            flexDirection: 'column',
+            textAlign: 'center',
+            padding: isMobile ? '20px' : '40px',
+            zIndex: 50,
+            color: '#333'
+          }}>
+            <div style={{ 
+              fontSize: isMobile ? '32px' : '48px', 
+              marginBottom: isMobile ? '15px' : '20px' 
+            }}>😅</div>
+            <div style={{ 
+              marginBottom: '10px', 
+              fontWeight: 'bold', 
+              color: '#ff6b6b',
+              fontSize: isMobile ? '14px' : '16px'
+            }}>Oops! 3D model couldn't load</div>
+            <div style={{ 
+              fontSize: isMobile ? '11px' : '13px', 
+              color: '#ccc',
+              maxWidth: isMobile ? '250px' : '300px'
+            }}>
+              Don't worry - the food still looks (and tastes) amazing! 🌮✨
+            </div>
           </div>
         )}
 
-        {/* AR Code Style Button */}
-        {modelStatus === 'loaded' && isMobile && (
-          <div
-            style={{
-              position: 'absolute',
-              bottom: '30px',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              zIndex: 100
-            }}
-          >
-            <button
-              onClick={handleViewInSpace}
-              style={{
-                background: 'linear-gradient(135deg, #007AFF, #0051D5)',
-                color: 'white',
-                border: 'none',
-                padding: '16px 32px',
-                borderRadius: '30px',
-                fontSize: '16px',
-                fontWeight: 'bold',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '10px',
-                transition: 'all 0.3s ease',
-                boxShadow: '0 8px 20px rgba(0, 122, 255, 0.4)',
-                border: '2px solid rgba(255, 255, 255, 0.2)'
-              }}
-              onMouseEnter={(e) => {
-                const target = e.target as HTMLButtonElement;
-                target.style.transform = 'translateY(-2px)';
-                target.style.boxShadow = '0 12px 25px rgba(0, 122, 255, 0.5)';
-              }}
-              onMouseLeave={(e) => {
-                const target = e.target as HTMLButtonElement;
-                target.style.transform = 'translateY(0)';
-                target.style.boxShadow = '0 8px 20px rgba(0, 122, 255, 0.4)';
-              }}
-            >
-              <span style={{ fontSize: '18px' }}>📱</span>
-              View in Your Space
-            </button>
+        </div>
+
+        {/* Modern Bottom Bar */}
+        {(
+          <div style={{
+            background: 'linear-gradient(135deg, #f8fffe, #f0fdf9)',
+            padding: isMobile ? '8px 12px' : '10px 16px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '12px',
+            borderTop: isMobile ? 'none' : '1px solid rgba(0,0,0,0.05)',
+            minHeight: isMobile ? '48px' : '52px'
+          }}>
+            <div style={{
+              fontSize: isMobile ? '11px' : '12px',
+              color: '#64748b',
+              flex: 1,
+              fontWeight: '500'
+            }}>
+              {isMobile ? 'Touch & pinch to interact' : 'Drag to rotate, scroll to zoom'}
+            </div>
+            
+            {modelPath && (
+              <button
+                onClick={handleViewInSpace}
+                style={{
+                  background: 'linear-gradient(135deg, #000000, #1a1a1a)',
+                  color: '#ffffff',
+                  border: 'none',
+                  borderRadius: '6px',
+                  padding: isMobile ? '12px 20px' : '10px 18px',
+                  fontSize: isMobile ? '13px' : '12px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  minWidth: isMobile ? '140px' : '120px',
+                  transition: 'all 0.15s ease',
+                  letterSpacing: '0.01em'
+                }}
+                onMouseEnter={(e) => {
+                  const target = e.target as HTMLButtonElement;
+                  target.style.background = 'linear-gradient(135deg, #1a1a1a, #2a2a2a)';
+                  target.style.transform = 'translateY(-1px)';
+                }}
+                onMouseLeave={(e) => {
+                  const target = e.target as HTMLButtonElement;
+                  target.style.background = 'linear-gradient(135deg, #000000, #1a1a1a)';
+                  target.style.transform = 'translateY(0)';
+                }}
+              >
+                View in Your Space
+              </button>
+            )}
           </div>
         )}
       </div>
-
-      <style>
-        {`
-          @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-          }
-        `}
-      </style>
     </div>
   );
-};
-
-export default AdvancedGLBViewer;
+}
