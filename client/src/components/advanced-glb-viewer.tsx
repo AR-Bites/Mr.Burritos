@@ -2,6 +2,15 @@ import React, { useRef, useEffect, useState } from 'react';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
+// Import model-viewer for native AR support
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      'model-viewer': any;
+    }
+  }
+}
+
 interface AdvancedGLBViewerProps {
   modelPath: string | null;
   dishName: string;
@@ -21,119 +30,65 @@ const AdvancedGLBViewer: React.FC<AdvancedGLBViewerProps> = ({
   const [loadingMessage, setLoadingMessage] = useState('Preparing your 3D experience...');
   const isMobile = typeof window !== 'undefined' ? window.innerWidth < 768 : false;
 
-  // Convert GLB to USDZ and Launch iOS AR
-  const handleViewInSpace = async () => {
-    if (!modelPath) {
-      alert('3D model not available for AR view');
-      return;
-    }
-
-    console.log('🔍 Starting AR for:', dishName);
-
-    // iOS - Convert GLB to USDZ using reliable service
-    if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
-      console.log('📱 iOS detected - converting GLB to USDZ');
-      
-      // Show loading
-      const loadingDiv = document.createElement('div');
-      loadingDiv.innerHTML = `
-        <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 999999; display: flex; align-items: center; justify-content: center;">
-          <div style="background: white; padding: 30px; border-radius: 15px; text-align: center; max-width: 300px;">
-            <div style="width: 50px; height: 50px; border: 4px solid #f3f3f3; border-top: 4px solid #007AFF; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
-            <h3 style="margin: 0 0 10px; color: #333;">Converting for iOS AR</h3>
-            <p style="margin: 0; color: #666;">Creating USDZ from GLB...</p>
-          </div>
-        </div>
-        <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
-      `;
-      document.body.appendChild(loadingDiv);
-      
-      try {
-        // Fetch GLB data
-        const response = await fetch(window.location.origin + modelPath);
-        const glbArrayBuffer = await response.arrayBuffer();
-        
-        // Convert using online converter
-        const formData = new FormData();
-        formData.append('file', new Blob([glbArrayBuffer], { type: 'model/gltf-binary' }), 'model.glb');
-        
-        const convertResponse = await fetch('https://converter.pausarstudio.de/api/convert', {
-          method: 'POST',
-          body: formData
-        });
-        
-        if (convertResponse.ok) {
-          const usdzArrayBuffer = await convertResponse.arrayBuffer();
-          const usdzBlob = new Blob([usdzArrayBuffer], { type: 'model/vnd.usdz+zip' });
-          const usdzUrl = URL.createObjectURL(usdzBlob);
-          
-          // Remove loading
-          document.body.removeChild(loadingDiv);
-          
-          // Launch iOS AR Quick Look
-          const arLink = document.createElement('a');
-          arLink.href = usdzUrl;
-          arLink.rel = 'ar';
-          
-          const img = document.createElement('img');
-          img.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
-          img.alt = dishName;
-          arLink.appendChild(img);
-          
-          arLink.style.display = 'none';
-          document.body.appendChild(arLink);
-          arLink.click();
-          
-          console.log('✅ iOS AR Quick Look launched with converted USDZ!');
-          
-          setTimeout(() => {
-            document.body.removeChild(arLink);
-            URL.revokeObjectURL(usdzUrl);
-          }, 2000);
-          
-        } else {
-          throw new Error('Conversion service failed');
-        }
-        
-      } catch (error) {
-        console.error('❌ Conversion failed:', error);
-        document.body.removeChild(loadingDiv);
-        
-        // Fallback: Try direct GLB approach 
-        const arLink = document.createElement('a');
-        arLink.href = window.location.origin + modelPath + '#ar';
-        arLink.rel = 'ar';
-        
-        const img = document.createElement('img');
-        img.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
-        img.alt = dishName;
-        arLink.appendChild(img);
-        
-        arLink.style.display = 'none';
-        document.body.appendChild(arLink);
-        arLink.click();
-        
-        console.log('⚠️ Fallback: Trying direct GLB with #ar');
-        
-        setTimeout(() => {
-          document.body.removeChild(arLink);
-        }, 1000);
-      }
-      
-      return;
-    }
-
-    // Android - Google Scene Viewer  
-    if (/Android/i.test(navigator.userAgent)) {
-      console.log('🤖 Android detected - using Google Scene Viewer');
-      const modelUrl = encodeURIComponent(window.location.origin + modelPath);
-      const sceneViewerUrl = `https://arvr.google.com/scene-viewer/1.0?file=${modelUrl}&mode=ar_only&title=${encodeURIComponent(dishName)}`;
-      window.open(sceneViewerUrl, '_blank');
-      return;
-    }
-
-    // Fallback
-    alert('AR viewing requires iOS (iPhone/iPad) or Android with AR support.');
+  // Native AR using model-viewer (like your working project!)
+  const handleViewInSpace = () => {
+    console.log('🔍 Launching native AR for:', dishName);
+    
+    // Create model-viewer element with native AR support
+    const modelViewer = document.createElement('model-viewer');
+    modelViewer.src = window.location.origin + modelPath;
+    modelViewer.setAttribute('ar', '');
+    modelViewer.setAttribute('ar-modes', 'quick-look scene-viewer webxr');
+    modelViewer.setAttribute('camera-controls', '');
+    modelViewer.style.width = '300px';
+    modelViewer.style.height = '300px';
+    modelViewer.style.position = 'fixed';
+    modelViewer.style.top = '50%';
+    modelViewer.style.left = '50%';
+    modelViewer.style.transform = 'translate(-50%, -50%)';
+    modelViewer.style.zIndex = '999999';
+    modelViewer.style.background = 'rgba(0,0,0,0.9)';
+    modelViewer.style.borderRadius = '15px';
+    
+    // Create AR button
+    const arButton = document.createElement('button');
+    arButton.textContent = 'VIEW IN YOUR SPACE';
+    arButton.setAttribute('slot', 'ar-button');
+    arButton.style.position = 'absolute';
+    arButton.style.bottom = '15px';
+    arButton.style.left = '50%';
+    arButton.style.transform = 'translateX(-50%)';
+    arButton.style.background = '#B22222';
+    arButton.style.color = 'white';
+    arButton.style.border = 'none';
+    arButton.style.padding = '12px 24px';
+    arButton.style.borderRadius = '25px';
+    arButton.style.fontWeight = 'bold';
+    arButton.style.cursor = 'pointer';
+    
+    // Create close button
+    const closeButton = document.createElement('button');
+    closeButton.textContent = '✕';
+    closeButton.style.position = 'absolute';
+    closeButton.style.top = '10px';
+    closeButton.style.right = '10px';
+    closeButton.style.background = 'rgba(255,255,255,0.8)';
+    closeButton.style.border = 'none';
+    closeButton.style.borderRadius = '50%';
+    closeButton.style.width = '30px';
+    closeButton.style.height = '30px';
+    closeButton.style.cursor = 'pointer';
+    closeButton.style.zIndex = '1000000';
+    
+    closeButton.onclick = () => {
+      document.body.removeChild(modelViewer);
+    };
+    
+    modelViewer.appendChild(arButton);
+    modelViewer.appendChild(closeButton);
+    document.body.appendChild(modelViewer);
+    
+    console.log('✅ Native AR model-viewer launched!');
   };
 
   // YOUR WORKING METHOD - Client-side GLB to USDZ conversion
