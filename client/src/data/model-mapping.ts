@@ -74,7 +74,11 @@ export const MODEL_MAPPING: Record<string, string> = {
 
 // Function to get 3D model path for a menu item
 export function getModelPath(itemId: string): string | null {
-  return MODEL_MAPPING[itemId] || null;
+  console.log('🔍 getModelPath called with ID:', itemId);
+  const path = MODEL_MAPPING[itemId] || null;
+  console.log('🔍 MODEL_MAPPING result for', itemId, ':', path);
+  console.log('🔍 Full MODEL_MAPPING:', MODEL_MAPPING);
+  return path;
 }
 
 // Function to check if an item has a 3D model
