@@ -66,7 +66,7 @@ export default function MenuCard({ item }: MenuCardProps) {
                 <Button
                   onClick={() => {
                     console.log('Opening 3D view for:', item.name, 'Model path:', modelPath);
-                    alert(`3D Button Clicked!\nItem: ${item.name}\nID: ${item.id}\nModel Path: ${modelPath}\nHas Model: ${has3DModel}`);
+                    // Debug removed
                     setShow3D(true);
                   }}
                   size="sm"
