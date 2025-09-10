@@ -58,7 +58,7 @@ export class MemStorage implements IStorage {
         isGlutenFree: false,
         ingredients: ["grilled chicken", "soft tortilla", "lettuce", "tomato", "cheese"],
         isAvailable: true,
-        modelPath: "/attached_assets/Beef_Soft(Tacos_Category)_1757459922076.glb"
+        modelPath: "/attached_assets/Beef_Soft(Tacos_Category)_1757504337270.glb"
       },
       {
         id: "3",
@@ -88,7 +88,7 @@ export class MemStorage implements IStorage {
         isGlutenFree: false,
         ingredients: ["ground beef", "soft tortilla", "lettuce", "tomato", "cheese"],
         isAvailable: true,
-        modelPath: "/attached_assets/Beef_Soft(Tacos_Category)_1757459922076.glb"
+        modelPath: "/attached_assets/Beef_Soft(Tacos_Category)_1757504337270.glb"
       },
       {
         id: "5",
