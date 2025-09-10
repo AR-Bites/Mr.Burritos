@@ -1150,7 +1150,8 @@ export class MemStorage implements IStorage {
       isVegetarian: insertItem.isVegetarian ?? false,
       isVegan: insertItem.isVegan ?? false,
       isGlutenFree: insertItem.isGlutenFree ?? false,
-      isAvailable: insertItem.isAvailable ?? true
+      isAvailable: insertItem.isAvailable ?? true,
+      modelPath: insertItem.modelPath ?? null
     };
     this.menuItems.set(id, item);
     return item;
