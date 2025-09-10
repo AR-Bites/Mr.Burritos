@@ -4,7 +4,7 @@ export const MODEL_MAPPING: Record<string, string> = {
   "1": "/attached_assets/Hard_Chicken_And_Beef(Tacos_Category)_1757459984599.glb", // Chicken Grilled (Hard)
   "2": "/attached_assets/Beef_Soft(Tacos_Category)_1757504337270.glb", // Chicken Grilled (Soft) - using beef soft model
   "3": "/attached_assets/Hard_Chicken_And_Beef(Tacos_Category)_1757459984599.glb", // Beef (Hard)
-  "4": "/attached_assets/Birria_Taco(Tacos_Category)_1757009224043.glb", // Beef (Soft) - TEMP TEST
+  "4": "/attached_assets/Beef_Soft(Tacos_Category)_1757504337270.glb", // Beef (Soft)
   "5": "/attached_assets/Hawaiian(Tacos_Category)_1757459996121.glb", // Hawaiian
   "6": "/attached_assets/Cherry_Beef(Tacos_Category)_1757459937111.glb", // Cherry Beef
   "7": "/attached_assets/Dynamite_Chicken(Tacos_Category)_1757010358338.glb", // Dynamite Chicken
