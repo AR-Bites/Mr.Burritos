@@ -17,7 +17,7 @@ export const MODEL_MAPPING: Record<string, string> = {
   "12": "/attached_assets/California_Style_Beef_and_Chicken(Burritos_Category)_1757459937112.glb", // California Style
   "13": "/attached_assets/Dynamite_Burrito_12__(Burritos_Category)_1757459964924.glb", // Dynamite Burrito
   "14": "/attached_assets/Burrito_Bowl(Burritos_Category)_1757508782758.glb", // Burrito Bowl (Customize your own)  
-  "75": "/attached_assets/Chicken_Tenders(Kids_Meals_Category)_1757459954449.glb", // Burrito Bowl Chicken - TEMP TEST
+  "75": "/attached_assets/Burrito_Bowl(Burritos_Category)_1757508782758.glb", // Burrito Bowl Chicken
   "15": "/attached_assets/Zinger_12__(Burritos_Category)_1757460081748.glb", // Zinger
   "16": "/attached_assets/Turkey_Burrito_10_(Burritos_Category)_1757460069037.glb", // Turkey Burrito
 
