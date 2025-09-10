@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;600;700;800&family=Arvo:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.cdnfonts.com">
+    <link href="https://fonts.cdnfonts.com/css/slabthing" rel="stylesheet">
+    <style>
+      @import url('https://fonts.cdnfonts.com/css/slabthing');
+      
+      .mr-burritos-logo {
+        font-family: 'Slabthing', 'SlabThing', 'Slab Thing', serif !important;
+        font-weight: normal !important;
+        letter-spacing: 0.02em !important;
+        text-rendering: optimizeLegibility !important;
+        font-display: swap !important;
+        color: #CC3333 !important;
+      }
+      
+      .mr-burritos-tagline {
+        font-size: 0.6em !important;
+        font-weight: 600 !important;
+        color: #CC3333 !important;
+        letter-spacing: 0.1em !important;
+        margin-top: -2px !important;
+        line-height: 1 !important;
+      }
+    </style>
+    
+    <!-- Preload only most critical images for faster initial load -->
+    <link rel="preload" as="image" href="/attached_assets/_D1A7788_1756996889294.jpg">
+    <link rel="preload" as="image" href="/attached_assets/_MG_8604_1756995764264.jpg">
+    <link rel="preload" as="image" href="/attached_assets/_MG_8355_1756995433426.jpg">
+    
+    <!-- Smart video preloading for better performance -->
+    <link rel="dns-prefetch" href="/attached_assets/">
+    
+    <script>
+      // Progressive image loading after initial page load
+      window.addEventListener('load', function() {
+        // Preload remaining images after page is loaded
+        const remainingImages = [
+          '/attached_assets/_D1A8089_1756996564018.jpg',
+          '/attached_assets/_D1A8311_1756996759114.jpg',
+          '/attached_assets/_MG_8459_1756996066769.jpg',
+          '/attached_assets/_D1A8240_1756996852560.jpg',
+          '/attached_assets/_D1A8224_1756996419454.jpg',
+          '/attached_assets/_D1A8060_1756995890967.jpg',
+          '/attached_assets/sauces-final.jpg'
+        ];
+        
+        // Use requestIdleCallback for better performance
+        if ('requestIdleCallback' in window) {
+          requestIdleCallback(() => {
+            remainingImages.forEach(src => {
+              const img = new Image();
+              img.src = src;
+            });
+          });
+        } else {
+          setTimeout(() => {
+            remainingImages.forEach(src => {
+              const img = new Image();
+              img.src = src;
+            });
+          }, 1000);
+        }
+      });
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+    <!-- This is a replit script which adds a banner on the top of the page when opened in development mode outside the replit environment -->
+    <script type="text/javascript" src="https://replit.com/public/js/replit-dev-banner.js"></script>
+  </body>
+</html>
