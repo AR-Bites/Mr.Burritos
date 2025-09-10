@@ -240,7 +240,7 @@ export class MemStorage implements IStorage {
         isGlutenFree: true,
         ingredients: ["rice", "beans", "choice of protein", "cheese", "lettuce", "tomato"],
         isAvailable: true,
-        modelPath: "/Burrito_Bowl(Burritos_Category)_1757508782758.glb"
+        modelPath: "/attached_assets/Burrito_Bowl(Burritos_Category)_1757508782758.glb"
       },
       {
         id: "15",
