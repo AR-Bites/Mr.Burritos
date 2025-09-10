@@ -14,8 +14,10 @@ interface MenuCardProps {
 export default function MenuCard({ item }: MenuCardProps) {
   const [show3D, setShow3D] = useState(false);
   
+  console.log('🔥 MenuCard for:', item.name, 'ID:', item.id);
   const modelPath = getModelPath(item.id);
   const has3DModel = hasModel(item.id);
+  console.log('🔥 MenuCard model path result:', modelPath);
 
   const renderSpiceLevel = () => {
     return (
