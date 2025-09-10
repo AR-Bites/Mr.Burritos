@@ -628,7 +628,17 @@ export default function AdvancedGLBViewer({ isOpen, onClose, dishName, modelPath
           }
         },
         (error) => {
-          console.error('❌ Error loading GLB model:', error);
+          console.error('❌ Error loading GLB model:', modelPath, error);
+          console.error('Error type:', error instanceof Error ? error.constructor.name : 'Unknown');
+          console.error('Error message:', error instanceof Error ? error.message : 'No message');
+          console.error('Error details:', error);
+          // Test if file exists by trying to fetch it
+          fetch(modelPath || '').then(response => {
+            console.log('File fetch status:', response.status, response.statusText);
+            console.log('File size:', response.headers.get('content-length'));
+          }).catch(fetchError => {
+            console.error('File fetch failed:', fetchError);
+          });
           setModelStatus('error');
         }
       );
