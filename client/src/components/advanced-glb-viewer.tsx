@@ -501,11 +501,16 @@ export default function AdvancedGLBViewer({ isOpen, onClose, dishName, modelPath
     }
 
     function regularLoadModel() {
-      if (!modelPath) return;
+      if (!modelPath) {
+        console.error('❌ No model path provided!');
+        return;
+      }
       
       console.log('🚀 Starting to load model:', modelPath);
       console.log('🔍 Model path type:', typeof modelPath);
       console.log('🔍 Model path length:', modelPath.length);
+      console.log('🔍 Full window location:', window.location.href);
+      console.log('🔍 Resolved URL:', new URL(modelPath, window.location.href).href);
       
       loader.load(
         modelPath,
