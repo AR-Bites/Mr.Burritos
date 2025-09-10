@@ -437,7 +437,7 @@ export default function AdvancedGLBViewer({ isOpen, onClose, dishName, modelPath
       // const scale = targetSize / maxDimension;
       // group.scale.setScalar(scale);
 
-      console.log('🔧 Group scale:', scale);
+      console.log('🔧 Group at original size - no scaling applied');
 
       scene.add(group);
 
@@ -554,7 +554,7 @@ export default function AdvancedGLBViewer({ isOpen, onClose, dishName, modelPath
           // const scale = targetSize / maxDimension;
           // group.scale.setScalar(scale);
 
-          console.log('🔧 Group scale:', scale);
+          console.log('🔧 Group at original size - no scaling applied');
 
           scene.add(group);
 
