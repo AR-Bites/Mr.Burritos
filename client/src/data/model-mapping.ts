@@ -2,9 +2,9 @@
 export const MODEL_MAPPING: Record<string, string> = {
   // TACOS Section - Updated with new models
   "1": "/attached_assets/Hard_Chicken_And_Beef(Tacos_Category)_1757459984599.glb", // Chicken Grilled (Hard)
-  "2": "/attached_assets/Beef_Soft(Tacos_Category)_1757504337270.glb", // Chicken Grilled (Soft) - using beef soft model
+  "2": "/Beef_Soft(Tacos_Category)_1757504337270.glb", // Chicken Grilled (Soft) - using beef soft model
   "3": "/attached_assets/Hard_Chicken_And_Beef(Tacos_Category)_1757459984599.glb", // Beef (Hard)
-  "4": "/attached_assets/Beef_Soft(Tacos_Category)_1757504337270.glb", // Beef (Soft)
+  "4": "/Beef_Soft(Tacos_Category)_1757504337270.glb", // Beef (Soft)
   "5": "/attached_assets/Hawaiian(Tacos_Category)_1757459996121.glb", // Hawaiian
   "6": "/attached_assets/Cherry_Beef(Tacos_Category)_1757459937111.glb", // Cherry Beef
   "7": "/attached_assets/Dynamite_Chicken(Tacos_Category)_1757010358338.glb", // Dynamite Chicken
@@ -16,7 +16,7 @@ export const MODEL_MAPPING: Record<string, string> = {
   "11": "/attached_assets/California_Style_Beef_and_Chicken(Burritos_Category)_1757459937112.glb", // Super Burrito Beef
   "12": "/attached_assets/California_Style_Beef_and_Chicken(Burritos_Category)_1757459937112.glb", // California Style
   "13": "/attached_assets/Dynamite_Burrito_12__(Burritos_Category)_1757459964924.glb", // Dynamite Burrito
-  "14": "/attached_assets/Burrito_Bowl(Burritos_Category)_1757459922075.glb", // Burrito Bowl
+  "14": "/Burrito_Bowl(Burritos_Category)_1757508782758.glb", // Burrito Bowl
   "15": "/attached_assets/Zinger_12__(Burritos_Category)_1757460081748.glb", // Zinger
   "16": "/attached_assets/Turkey_Burrito_10_(Burritos_Category)_1757460069037.glb", // Turkey Burrito
 
@@ -83,7 +83,7 @@ export function hasModel(itemId: string): boolean {
 
 // All available 3D models - updated with new high-quality models
 export const AVAILABLE_MODELS = [
-  "Burrito_Bowl(Burritos_Category)_1757459922075.glb",
+  "Burrito_Bowl(Burritos_Category)_1757508782758.glb",
   "Beef_Soft(Tacos_Category)_1757504337270.glb",
   "Cherry_Beef(Tacos_Category)_1757459937111.glb",
   "California_Style_Beef_and_Chicken(Burritos_Category)_1757459937112.glb",
