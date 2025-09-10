@@ -503,10 +503,14 @@ export default function AdvancedGLBViewer({ isOpen, onClose, dishName, modelPath
     function regularLoadModel() {
       if (!modelPath) return;
       
+      console.log('🚀 Starting to load model:', modelPath);
+      console.log('🔍 Model path type:', typeof modelPath);
+      console.log('🔍 Model path length:', modelPath.length);
+      
       loader.load(
         modelPath,
         (gltf) => {
-          console.log('🎉 Model successfully loaded and rendered!');
+          console.log('🎉 Model successfully loaded and rendered!', modelPath);
           setModelStatus('loaded');
           
           // Optimize model materials for faster rendering
@@ -628,17 +632,22 @@ export default function AdvancedGLBViewer({ isOpen, onClose, dishName, modelPath
           }
         },
         (error) => {
-          console.error('❌ Error loading GLB model:', modelPath, error);
-          console.error('Error type:', error instanceof Error ? error.constructor.name : 'Unknown');
-          console.error('Error message:', error instanceof Error ? error.message : 'No message');
-          console.error('Error details:', error);
+          console.error('❌ CRITICAL ERROR loading GLB model:', modelPath);
+          console.error('❌ Error type:', error instanceof Error ? error.constructor.name : 'Unknown');
+          console.error('❌ Error message:', error instanceof Error ? error.message : 'No message');
+          console.error('❌ Full error object:', error);
+          console.error('❌ Error stack:', error instanceof Error ? error.stack : 'No stack');
+          
           // Test if file exists by trying to fetch it
+          console.log('🔍 Testing file accessibility...');
           fetch(modelPath || '').then(response => {
-            console.log('File fetch status:', response.status, response.statusText);
-            console.log('File size:', response.headers.get('content-length'));
+            console.log('✅ File fetch status:', response.status, response.statusText);
+            console.log('✅ File size:', response.headers.get('content-length'), 'bytes');
+            console.log('✅ Content type:', response.headers.get('content-type'));
           }).catch(fetchError => {
-            console.error('File fetch failed:', fetchError);
+            console.error('❌ File fetch failed:', fetchError);
           });
+          
           setModelStatus('error');
         }
       );
