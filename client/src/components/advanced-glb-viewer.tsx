@@ -431,13 +431,13 @@ export default function AdvancedGLBViewer({ isOpen, onClose, dishName, modelPath
       // Center the model using subtract method (same as original)
       clonedModel.position.sub(center);
 
-      // Keep original model size - no scaling
-      // const maxDimension = Math.max(size.x, size.y, size.z);
-      // const targetSize = 3;
-      // const scale = targetSize / maxDimension;
-      // group.scale.setScalar(scale);
+      // Scale preloaded model to appropriate size for 3D preview  
+      const maxDimension = Math.max(size.x, size.y, size.z);
+      const targetSize = 4; // Make preview bigger - good size for viewing
+      const scale = targetSize / maxDimension;
+      group.scale.setScalar(scale);
 
-      console.log('🔧 Group at original size - no scaling applied');
+      console.log('🔧 Scaled preloaded 3D preview to size:', targetSize, 'scale:', scale);
 
       scene.add(group);
 
@@ -556,13 +556,13 @@ export default function AdvancedGLBViewer({ isOpen, onClose, dishName, modelPath
           // Center the model
           gltf.scene.position.sub(center);
 
-          // Keep original model size - no scaling
-          // const maxDimension = Math.max(size.x, size.y, size.z);
-          // const targetSize = 3; // Desired size in the scene
-          // const scale = targetSize / maxDimension;
-          // group.scale.setScalar(scale);
+          // Scale model to appropriate size for 3D preview (not AR)
+          const maxDimension = Math.max(size.x, size.y, size.z);
+          const targetSize = 4; // Make preview bigger - good size for viewing
+          const scale = targetSize / maxDimension;
+          group.scale.setScalar(scale);
 
-          console.log('🔧 Group at original size - no scaling applied');
+          console.log('🔧 Scaled 3D preview to size:', targetSize, 'scale:', scale);
 
           scene.add(group);
 
