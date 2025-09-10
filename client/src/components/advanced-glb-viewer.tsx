@@ -647,8 +647,6 @@ export default function AdvancedGLBViewer({ isOpen, onClose, dishName, modelPath
           console.error('❌ Full error object:', error);
           console.error('❌ Error stack:', error instanceof Error ? error.stack : 'No stack');
           
-          // TEMPORARY DEBUG ALERT
-          alert(`GLB Error: ${error instanceof Error ? error.message : 'Unknown error'}\nPath: ${modelPath}`);
           
           // Test if file exists by trying to fetch it
           console.log('🔍 Testing file accessibility...');
