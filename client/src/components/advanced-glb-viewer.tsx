@@ -12,6 +12,13 @@ interface AdvancedGLBViewerProps {
 }
 
 export default function AdvancedGLBViewer({ isOpen, onClose, dishName, modelPath }: AdvancedGLBViewerProps) {
+  
+  // CRITICAL DEBUG - Log everything on component mount
+  console.log('🔥 GLB Viewer mounted!');
+  console.log('🔥 isOpen:', isOpen);
+  console.log('🔥 dishName:', dishName);
+  console.log('🔥 modelPath:', modelPath);
+  console.log('🔥 modelPath type:', typeof modelPath);
   const containerRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
