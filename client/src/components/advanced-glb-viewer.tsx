@@ -512,6 +512,9 @@ export default function AdvancedGLBViewer({ isOpen, onClose, dishName, modelPath
       console.log('🔍 Full window location:', window.location.href);
       console.log('🔍 Resolved URL:', new URL(modelPath, window.location.href).href);
       
+      console.log('🔥 Attempting to load GLB model:', modelPath);
+      console.log('🔥 Full URL being loaded:', new URL(modelPath, window.location.origin).href);
+      
       loader.load(
         modelPath,
         (gltf) => {
@@ -638,6 +641,7 @@ export default function AdvancedGLBViewer({ isOpen, onClose, dishName, modelPath
         },
         (error) => {
           console.error('❌ CRITICAL ERROR loading GLB model:', modelPath);
+          console.error('❌ Full URL attempted:', new URL(modelPath, window.location.origin).href);
           console.error('❌ Error type:', error instanceof Error ? error.constructor.name : 'Unknown');
           console.error('❌ Error message:', error instanceof Error ? error.message : 'No message');
           console.error('❌ Full error object:', error);
