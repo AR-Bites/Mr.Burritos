@@ -272,6 +272,21 @@ export class MemStorage implements IStorage {
         isAvailable: true,
         modelPath: "/attached_assets/Turkey_Burrito_10_(Burritos_Category)_1757460069037.glb"
       },
+      {
+        id: "75",
+        name: "Burrito Bowl Chicken",
+        description: "All the burrito goodness in a bowl with chicken - fully customizable",
+        price: "4.99 JD",
+        category: CATEGORIES.BURRITOS,
+        imageUrl: "https://pixabay.com/get/g10911d1a7c3f29d43466505cb30da4bf371fba7f0ee302c56d5ea6eeabc22ac91c97f8ff897a8b17ae687fd9f791ef3dd22fc30c6da155e3cc9be390b2ba55a2_1280.jpg",
+        spiceLevel: 1,
+        isVegetarian: false,
+        isVegan: false,
+        isGlutenFree: true,
+        ingredients: ["grilled chicken", "rice", "beans", "cheese", "lettuce", "tomato"],
+        isAvailable: true,
+        modelPath: "/attached_assets/Burrito_Bowl(Burritos_Category)_1757508782758.glb"
+      },
 
       // 🍔 BURGERS
       {
